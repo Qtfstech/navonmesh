@@ -1,0 +1,6 @@
+{
+  "name": "Navonmesh Summit 2026",
+  "description": "Official portal for Navonmesh Summit 2026: India's national research, innovation, startup, and academia conclave with expo showcases, registrations, and hackathon.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

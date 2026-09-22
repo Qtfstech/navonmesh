@@ -1,0 +1,555 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-navy: var(--navy);
+  --color-paper: var(--paper);
+  --color-signal: var(--signal);
+  --color-mint: var(--mint);
+  --color-night: var(--night);
+  --color-night-deep: var(--night-deep);
+  --color-night-surface: var(--night-surface);
+  --color-night-foreground: var(--night-foreground);
+  --color-tech: var(--tech);
+}
+
+:root {
+  --radius: 0.5rem;
+  --navy: oklch(0.207 0.055 250.5);
+  --paper: oklch(0.965 0.012 82.2);
+  --signal: oklch(0.704 0.196 43.7);
+  --mint: oklch(0.752 0.126 168.7);
+  --night: oklch(0.145 0.036 248.5);
+  --night-deep: oklch(0.108 0.028 255.2);
+  --night-surface: oklch(0.183 0.038 248.2);
+  --night-foreground: oklch(0.955 0.014 224.1);
+  --tech: oklch(0.794 0.137 203.6);
+  --background: var(--paper);
+  --foreground: var(--navy);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.129 0.042 264.695);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.129 0.042 264.695);
+  --primary: oklch(0.208 0.042 265.755);
+  --primary-foreground: oklch(0.984 0.003 247.858);
+  --secondary: oklch(0.968 0.007 247.896);
+  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --muted: oklch(0.968 0.007 247.896);
+  --muted-foreground: oklch(0.554 0.046 257.417);
+  --accent: oklch(0.968 0.007 247.896);
+  --accent-foreground: oklch(0.208 0.042 265.755);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.929 0.013 255.508);
+  --input: oklch(0.929 0.013 255.508);
+  --ring: oklch(0.704 0.04 256.788);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.984 0.003 247.858);
+  --sidebar-foreground: oklch(0.129 0.042 264.695);
+  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.968 0.007 247.896);
+  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
+  --sidebar-border: oklch(0.929 0.013 255.508);
+  --sidebar-ring: oklch(0.704 0.04 256.788);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+    letter-spacing: 0;
+    margin: 0;
+    scroll-behavior: smooth;
+  }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes link-pulse {
+  0%, 100% { opacity: 0.35; transform: scaleX(0.55); transform-origin: left; }
+  50% { opacity: 1; transform: scaleX(1); transform-origin: left; }
+}
+
+@utility bg-hero-wash {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--night) 72%, transparent), var(--night) 94% 82%, var(--night));
+}
+
+@utility bg-card-wash {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--night) 6%, transparent) 12%, color-mix(in oklab, var(--night) 52%, transparent) 48%, var(--night) 96%);
+}
+
+@utility shadow-signal {
+  box-shadow: 0 10px 30px color-mix(in oklab, var(--signal) 25%, transparent);
+}
+
+@utility shadow-night {
+  box-shadow: 0 30px 70px color-mix(in oklab, var(--night-deep) 65%, transparent);
+}
+
+@utility tech-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--tech) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--tech) 10%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, transparent, black 30%, transparent 90%);
+}
+
+@utility event-link {
+  animation: link-pulse 2.8s ease-in-out infinite;
+}
+
+@utility event-tape {
+  animation: marquee 24s linear infinite;
+}
+
+@utility event-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes shine-sweep {
+  0%, 12% {
+    transform: translateX(-160%) skewX(-18deg);
+  }
+  55%, 100% {
+    transform: translateX(160%) skewX(-18deg);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@utility event-shine {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    background: linear-gradient(
+      115deg,
+      transparent 8%,
+      color-mix(in oklab, var(--signal) 35%, transparent) 32%,
+      color-mix(in oklab, white 92%, transparent) 50%,
+      color-mix(in oklab, var(--mint) 35%, transparent) 68%,
+      transparent 92%
+    );
+    mix-blend-mode: multiply;
+    /* Optional clip to a logo's own alpha shape when --shine-mask is set
+       inline (e.g. a logo with no filled backdrop); defaults to unmasked
+       for filled surfaces like the white partner-logo cards. */
+    mask-image: var(--shine-mask, none);
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    mask-position: center;
+    -webkit-mask-image: var(--shine-mask, none);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    -webkit-mask-position: center;
+    transform: translateX(-180%) skewX(-18deg);
+    animation: shine-sweep 3.6s ease-in-out infinite;
+  }
+}
+
+@utility event-glow {
+  animation: glow-pulse 3.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-tape,
+  .event-float,
+  .event-link,
+  .event-glow {
+    animation: none;
+  }
+
+  .event-shine::after {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   LIGHT MODE ENGINE
+   Strictly scoped under `html.theme-light` so the default dark mode is 100% untouched.
+   ========================================================================== */
+
+html.theme-light {
+  --night: oklch(0.985 0.005 240);          /* #f8fafc slate-50 light canvas */
+  --night-deep: oklch(0.955 0.01 240);       /* #f1f5f9 slate-100 alternating section */
+  --night-surface: oklch(1 0 0);             /* #ffffff pure white elevated card */
+  --night-foreground: oklch(0.18 0.035 255); /* #0f172a slate-900 high contrast text */
+  --tech: oklch(0.52 0.20 250);              /* #2563eb royal electric blue with 5.5:1+ contrast */
+  --border: oklch(0.88 0.015 250);           /* Slate-200 border */
+  --color-border: oklch(0.88 0.015 250);
+  --background: var(--night);
+  --foreground: var(--night-foreground);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.035 255);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.035 255);
+  --input: oklch(0.88 0.015 250);
+  --muted: oklch(0.94 0.01 240);
+  --muted-foreground: oklch(0.40 0.03 250);
+  color-scheme: light;
+}
+
+/* Base text contrast in light mode: convert pure white and translucent white text to deep slate */
+html.theme-light .text-white,
+html.theme-light [class*="text-white/"] {
+  color: oklch(0.18 0.035 255) !important;
+}
+
+html.theme-light [class*="text-white/60"],
+html.theme-light [class*="text-white/70"],
+html.theme-light [class*="text-white/75"] {
+  color: oklch(0.35 0.03 255) !important;
+}
+
+/* Boost readability of translucent night-foreground text in light mode */
+html.theme-light [class*="text-night-foreground/50"],
+html.theme-light [class*="text-night-foreground/55"],
+html.theme-light [class*="text-night-foreground/60"] {
+  color: oklch(0.36 0.03 255) !important; /* ~ slate-700 / slate-800: crisp 7.5:1+ contrast */
+}
+
+html.theme-light [class*="text-night-foreground/65"],
+html.theme-light [class*="text-night-foreground/70"],
+html.theme-light [class*="text-night-foreground/75"],
+html.theme-light [class*="text-night-foreground/80"],
+html.theme-light [class*="text-night-foreground/85"],
+html.theme-light [class*="text-night-foreground/90"] {
+  color: oklch(0.18 0.035 255) !important; /* ~ slate-900: sharp 14:1+ contrast */
+}
+
+html.theme-light [class*="text-night-foreground/20"],
+html.theme-light [class*="text-night-foreground/30"],
+html.theme-light [class*="text-night-foreground/40"] {
+  color: oklch(0.50 0.025 255) !important; /* ~ slate-500: clearly visible secondary elements & watermarks */
+}
+
+/* Preserve white text on dark/vibrant action controls, buttons, and photo overlay chips */
+html.theme-light .bg-signal,
+html.theme-light [class*="bg-signal"],
+html.theme-light .text-paper,
+html.theme-light .keep-white,
+html.theme-light .keep-white *,
+html.theme-light button.bg-signal,
+html.theme-light a.bg-signal,
+html.theme-light [class*="bg-signal"] span,
+html.theme-light [class*="bg-signal"] svg,
+html.theme-light [class*="bg-signal/"] span,
+html.theme-light [class*="bg-signal/"] svg,
+html.theme-light [class*="bg-black/"] .text-white,
+html.theme-light [class*="bg-black/"] [class*="text-white/"],
+html.theme-light [class*="bg-black/60"] span,
+html.theme-light [class*="bg-black/80"] span {
+  color: #ffffff !important;
+}
+
+/* Wordmark switching for optimal contrast (SVG-compliant display inline) */
+.navonmesh-wordmark-dark {
+  display: inline;
+}
+.navonmesh-wordmark-light {
+  display: none;
+}
+
+html.theme-light .navonmesh-wordmark-dark {
+  display: none !important;
+}
+html.theme-light .navonmesh-wordmark-light {
+  display: inline !important;
+}
+
+/* Top conclave ribbon styling in light mode */
+html.theme-light .conclave-top-ribbon {
+  background-color: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.15) !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.theme-light .conclave-ribbon-title {
+  background-image: linear-gradient(90deg, #ea580c 0%, #0f172a 45%, #047857 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+html.theme-light .conclave-ribbon-divider {
+  color: #94a3b8 !important;
+}
+
+/* Header in light mode */
+html.theme-light header {
+  background-color: rgba(248, 250, 252, 0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+/* Borders & Cards in light mode */
+html.theme-light [class*="border-night-foreground/10"],
+html.theme-light [class*="border-night-foreground/15"] {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+html.theme-light [class*="border-white/10"],
+html.theme-light [class*="border-white/15"],
+html.theme-light [class*="border-white/20"] {
+  border-color: rgba(15, 23, 42, 0.14) !important;
+}
+
+html.theme-light [class*="bg-night-surface"] {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+}
+
+html.theme-light [class*="bg-night-deep/80"],
+html.theme-light [class*="bg-night-deep/90"],
+html.theme-light [class*="bg-night-deep/95"],
+html.theme-light [class*="bg-night/60"],
+html.theme-light [class*="bg-night/80"],
+html.theme-light [class*="bg-night/85"],
+html.theme-light [class*="bg-night/95"] {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+}
+
+/* Telemetry gradient cards in light mode */
+html.theme-light [class*="from-night-surface/90"] {
+  --tw-gradient-from: rgba(255, 255, 255, 0.98) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgba(241, 245, 249, 0.98) var(--tw-gradient-to-position);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.07);
+}
+
+/* Countdown digital HUD boxes in light mode */
+html.theme-light [class*="bg-black/40"] {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.theme-light [class*="bg-black/40"] span:first-child {
+  color: #0f172a !important;
+}
+
+html.theme-light [class*="bg-black/40"] span:last-child {
+  color: #475569 !important;
+}
+
+/* Tri-pillar Conclave pill in light mode */
+html.theme-light [class*="bg-emerald-950/40"] {
+  background-color: #ecfdf5 !important;
+  border-color: #6ee7b7 !important;
+}
+html.theme-light [class*="text-emerald-300"] {
+  color: #047857 !important;
+}
+
+/* Hero tri-pillar awards pill */
+html.theme-light [class*="border-tech/30"][class*="bg-tech/10"] {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+/* Partner logo cards in light mode */
+html.theme-light [class*="bg-white"] {
+  background-color: #ffffff !important;
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+
+/* Tech specs and micro-tag pills */
+html.theme-light [class*="bg-night-foreground/5"] {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+/* Registration & input controls in light mode */
+html.theme-light input,
+html.theme-light textarea,
+html.theme-light select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.theme-light input::placeholder,
+html.theme-light textarea::placeholder {
+  color: #64748b !important;
+}
+
+html.theme-light [role="radiogroup"] label {
+  color: #0f172a !important;
+}
+
+/* Chatbot assistant in light mode */
+html.theme-light [class*="rounded-bl-sm"][class*="bg-night"] {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+html.theme-light [class*="rounded-bl-sm"][class*="bg-night"] p {
+  color: #0f172a !important;
+}
+
+/* Dialog modals in light mode */
+html.theme-light [role="dialog"],
+html.theme-light [data-slot="dialog-content"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+}
+
+html.theme-light [role="dialog"] h2,
+html.theme-light [role="dialog"] h3,
+html.theme-light [role="dialog"] [data-slot="dialog-title"],
+html.theme-light [data-slot="dialog-content"] [data-slot="dialog-title"] {
+  color: #0f172a !important;
+}
+
+html.theme-light [role="dialog"] p,
+html.theme-light [role="dialog"] [data-slot="dialog-description"],
+html.theme-light [data-slot="dialog-content"] [data-slot="dialog-description"] {
+  color: #334155 !important;
+}
+
+/* Background canvas particles in light mode */
+html.theme-light canvas {
+  opacity: 0.65;
+  filter: contrast(1.25);
+}
+
+/* Subtle glow reductions in light mode */
+html.theme-light [class*="blur-3xl"] {
+  opacity: 0.35 !important;
+}
+
+/* Mobile drawer in light mode */
+html.theme-light [data-slot="sheet-content"] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #e2e8f0 !important;
+}
