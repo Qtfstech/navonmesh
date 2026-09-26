@@ -23,16 +23,16 @@ export const faqDataset: FaqEntry[] = [
     question: "How do organizations register for the summit?",
     answer:
       "Organizations can register to showcase products at the Tech Expo, sponsor the summit, nominate for industry awards, or send delegates using the Registration form on this site.",
-    action: { label: "Go to Registration", href: "#register" },
+    action: { label: "Go to Registration", href: "/register" },
     keywords: ["register", "organization", "company", "booth", "exhibit", "expo", "delegate", "corporate", "pass"],
   },
   {
     id: "fee-hackathon",
-    question: "What is the fee for the student hackathon?",
+    question: "What is the fee for Navonmesh HackFest?",
     answer:
-      "The entry fee for the Navonmesh Hackathon 2026 is ₹500 per participant. Winners are eligible to sign an MoU with BSNL to work as System Integrators for real deployments.",
-    action: { label: "Register for Hackathon", href: "#register" },
-    keywords: ["fee", "cost", "hackathon", "student", "price", "entry", "bsnl", "prize", "mou"],
+      "The entry fee for Navonmesh HackFest is ₹499/- per participant. Teams build working prototypes on real industry problem statements.",
+    action: { label: "Register for HackFest", href: "#get-involved-hackathon" },
+    keywords: ["fee", "cost", "hackathon", "hackfest", "student", "price", "entry", "bsnl", "prize"],
   },
   {
     id: "sponsorship",
@@ -53,8 +53,8 @@ export const faqDataset: FaqEntry[] = [
     id: "bsnl",
     question: "What is BSNL's role in the summit?",
     answer:
-      "BSNL is a premier partner of Navonmesh Summit 2026. BSNL leadership will participate in keynotes, explore indigenous telecom equipment from exhibitors, and offer System Integrator MoU pathways to standout hackathon prototypes.",
-    keywords: ["bsnl", "telecom", "mou", "partner", "government", "integrator"],
+      "BSNL is a premier partner of Navonmesh Summit 2026. BSNL leadership will participate in keynotes, explore indigenous telecom equipment from exhibitors, and mentor standout HackFest prototypes.",
+    keywords: ["bsnl", "telecom", "partner", "government"],
   },
   {
     id: "sectors",

@@ -72,7 +72,7 @@ const TECH_AI_ITEMS: TechAiItem[] = [
     pavilion: "Pavilion 04 · Industrial Automation",
     specs: ["Sub-Millimeter Repeatability", "Stereo Spatial Depth SLAM", "Torque Sensor Feedback"],
     imageUrl: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80",
-    highlights: "Student hackathon winner testbeds integrated directly with industrial safety protocols.",
+    highlights: "HackFest winner testbeds integrated directly with industrial safety protocols.",
   },
   {
     id: "quantum-computing",
@@ -393,7 +393,7 @@ export function TechAiShowcaseScroll() {
                   asChild
                   className="flex-1 rounded-full bg-signal text-paper hover:bg-signal/90 font-medium"
                 >
-                  <a href="#register" onClick={() => setSelectedItem(null)}>
+                  <a href="/register" onClick={() => setSelectedItem(null)}>
                     Register to Experience Live
                   </a>
                 </Button>

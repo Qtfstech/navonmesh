@@ -3,6 +3,8 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+/* Desktop windows with little vertical room (laptops with browser chrome): hero compacts to fit. */
+@custom-variant short (@media (min-width: 1024px) and (max-height: 760px));
 
 /*
  * Design system definition.
@@ -157,6 +159,20 @@
     border-color: var(--color-border);
   }
 
+  /* Phones: scale the whole page down slightly (Tailwind sizes are rem-based). */
+  @media (max-width: 639px) {
+    html {
+      font-size: 14px;
+    }
+
+    /* Below 16px, iOS Safari zooms the page when an input is focused. */
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -277,6 +293,29 @@
   animation: glow-pulse 3.2s ease-in-out infinite;
 }
 
+/* Scroll reveal (see src/hooks/use-scroll-reveal.ts). Uses `animation` + `transform`, so it
+   doesn't clash with cards' own hover transitions, which use Tailwind's `translate`/`scale`. */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(48px) scale(0.97);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.reveal:not(.is-revealed) {
+  opacity: 0;
+}
+
+.reveal.is-revealed {
+  animation: reveal-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0ms) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .event-tape,
   .event-float,
@@ -289,267 +328,4 @@
     animation: none;
     display: none;
   }
-}
-
-/* ==========================================================================
-   LIGHT MODE ENGINE
-   Strictly scoped under `html.theme-light` so the default dark mode is 100% untouched.
-   ========================================================================== */
-
-html.theme-light {
-  --night: oklch(0.985 0.005 240);          /* #f8fafc slate-50 light canvas */
-  --night-deep: oklch(0.955 0.01 240);       /* #f1f5f9 slate-100 alternating section */
-  --night-surface: oklch(1 0 0);             /* #ffffff pure white elevated card */
-  --night-foreground: oklch(0.18 0.035 255); /* #0f172a slate-900 high contrast text */
-  --tech: oklch(0.52 0.20 250);              /* #2563eb royal electric blue with 5.5:1+ contrast */
-  --border: oklch(0.88 0.015 250);           /* Slate-200 border */
-  --color-border: oklch(0.88 0.015 250);
-  --background: var(--night);
-  --foreground: var(--night-foreground);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.035 255);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.035 255);
-  --input: oklch(0.88 0.015 250);
-  --muted: oklch(0.94 0.01 240);
-  --muted-foreground: oklch(0.40 0.03 250);
-  color-scheme: light;
-}
-
-/* Base text contrast in light mode: convert pure white and translucent white text to deep slate */
-html.theme-light .text-white,
-html.theme-light [class*="text-white/"] {
-  color: oklch(0.18 0.035 255) !important;
-}
-
-html.theme-light [class*="text-white/60"],
-html.theme-light [class*="text-white/70"],
-html.theme-light [class*="text-white/75"] {
-  color: oklch(0.35 0.03 255) !important;
-}
-
-/* Boost readability of translucent night-foreground text in light mode */
-html.theme-light [class*="text-night-foreground/50"],
-html.theme-light [class*="text-night-foreground/55"],
-html.theme-light [class*="text-night-foreground/60"] {
-  color: oklch(0.36 0.03 255) !important; /* ~ slate-700 / slate-800: crisp 7.5:1+ contrast */
-}
-
-html.theme-light [class*="text-night-foreground/65"],
-html.theme-light [class*="text-night-foreground/70"],
-html.theme-light [class*="text-night-foreground/75"],
-html.theme-light [class*="text-night-foreground/80"],
-html.theme-light [class*="text-night-foreground/85"],
-html.theme-light [class*="text-night-foreground/90"] {
-  color: oklch(0.18 0.035 255) !important; /* ~ slate-900: sharp 14:1+ contrast */
-}
-
-html.theme-light [class*="text-night-foreground/20"],
-html.theme-light [class*="text-night-foreground/30"],
-html.theme-light [class*="text-night-foreground/40"] {
-  color: oklch(0.50 0.025 255) !important; /* ~ slate-500: clearly visible secondary elements & watermarks */
-}
-
-/* Preserve white text on dark/vibrant action controls, buttons, and photo overlay chips */
-html.theme-light .bg-signal,
-html.theme-light [class*="bg-signal"],
-html.theme-light .text-paper,
-html.theme-light .keep-white,
-html.theme-light .keep-white *,
-html.theme-light button.bg-signal,
-html.theme-light a.bg-signal,
-html.theme-light [class*="bg-signal"] span,
-html.theme-light [class*="bg-signal"] svg,
-html.theme-light [class*="bg-signal/"] span,
-html.theme-light [class*="bg-signal/"] svg,
-html.theme-light [class*="bg-black/"] .text-white,
-html.theme-light [class*="bg-black/"] [class*="text-white/"],
-html.theme-light [class*="bg-black/60"] span,
-html.theme-light [class*="bg-black/80"] span {
-  color: #ffffff !important;
-}
-
-/* Wordmark switching for optimal contrast (SVG-compliant display inline) */
-.navonmesh-wordmark-dark {
-  display: inline;
-}
-.navonmesh-wordmark-light {
-  display: none;
-}
-
-html.theme-light .navonmesh-wordmark-dark {
-  display: none !important;
-}
-html.theme-light .navonmesh-wordmark-light {
-  display: inline !important;
-}
-
-/* Top conclave ribbon styling in light mode */
-html.theme-light .conclave-top-ribbon {
-  background-color: #ffffff !important;
-  border-color: rgba(15, 23, 42, 0.15) !important;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
-}
-
-html.theme-light .conclave-ribbon-title {
-  background-image: linear-gradient(90deg, #ea580c 0%, #0f172a 45%, #047857 100%) !important;
-  -webkit-background-clip: text !important;
-  background-clip: text !important;
-  color: transparent !important;
-}
-
-html.theme-light .conclave-ribbon-divider {
-  color: #94a3b8 !important;
-}
-
-/* Header in light mode */
-html.theme-light header {
-  background-color: rgba(248, 250, 252, 0.92);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-}
-
-/* Borders & Cards in light mode */
-html.theme-light [class*="border-night-foreground/10"],
-html.theme-light [class*="border-night-foreground/15"] {
-  border-color: rgba(15, 23, 42, 0.12) !important;
-}
-
-html.theme-light [class*="border-white/10"],
-html.theme-light [class*="border-white/15"],
-html.theme-light [class*="border-white/20"] {
-  border-color: rgba(15, 23, 42, 0.14) !important;
-}
-
-html.theme-light [class*="bg-night-surface"] {
-  background-color: #ffffff !important;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-}
-
-html.theme-light [class*="bg-night-deep/80"],
-html.theme-light [class*="bg-night-deep/90"],
-html.theme-light [class*="bg-night-deep/95"],
-html.theme-light [class*="bg-night/60"],
-html.theme-light [class*="bg-night/80"],
-html.theme-light [class*="bg-night/85"],
-html.theme-light [class*="bg-night/95"] {
-  background-color: rgba(255, 255, 255, 0.96) !important;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
-}
-
-/* Telemetry gradient cards in light mode */
-html.theme-light [class*="from-night-surface/90"] {
-  --tw-gradient-from: rgba(255, 255, 255, 0.98) var(--tw-gradient-from-position);
-  --tw-gradient-to: rgba(241, 245, 249, 0.98) var(--tw-gradient-to-position);
-  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.07);
-}
-
-/* Countdown digital HUD boxes in light mode */
-html.theme-light [class*="bg-black/40"] {
-  background-color: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-}
-
-html.theme-light [class*="bg-black/40"] span:first-child {
-  color: #0f172a !important;
-}
-
-html.theme-light [class*="bg-black/40"] span:last-child {
-  color: #475569 !important;
-}
-
-/* Tri-pillar Conclave pill in light mode */
-html.theme-light [class*="bg-emerald-950/40"] {
-  background-color: #ecfdf5 !important;
-  border-color: #6ee7b7 !important;
-}
-html.theme-light [class*="text-emerald-300"] {
-  color: #047857 !important;
-}
-
-/* Hero tri-pillar awards pill */
-html.theme-light [class*="border-tech/30"][class*="bg-tech/10"] {
-  background-color: #eff6ff !important;
-  border-color: #bfdbfe !important;
-  color: #1d4ed8 !important;
-}
-
-/* Partner logo cards in light mode */
-html.theme-light [class*="bg-white"] {
-  background-color: #ffffff !important;
-  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
-}
-
-/* Tech specs and micro-tag pills */
-html.theme-light [class*="bg-night-foreground/5"] {
-  background-color: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #1e293b !important;
-}
-
-/* Registration & input controls in light mode */
-html.theme-light input,
-html.theme-light textarea,
-html.theme-light select {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #cbd5e1 !important;
-}
-
-html.theme-light input::placeholder,
-html.theme-light textarea::placeholder {
-  color: #64748b !important;
-}
-
-html.theme-light [role="radiogroup"] label {
-  color: #0f172a !important;
-}
-
-/* Chatbot assistant in light mode */
-html.theme-light [class*="rounded-bl-sm"][class*="bg-night"] {
-  background-color: #f1f5f9 !important;
-  color: #0f172a !important;
-}
-html.theme-light [class*="rounded-bl-sm"][class*="bg-night"] p {
-  color: #0f172a !important;
-}
-
-/* Dialog modals in light mode */
-html.theme-light [role="dialog"],
-html.theme-light [data-slot="dialog-content"] {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
-}
-
-html.theme-light [role="dialog"] h2,
-html.theme-light [role="dialog"] h3,
-html.theme-light [role="dialog"] [data-slot="dialog-title"],
-html.theme-light [data-slot="dialog-content"] [data-slot="dialog-title"] {
-  color: #0f172a !important;
-}
-
-html.theme-light [role="dialog"] p,
-html.theme-light [role="dialog"] [data-slot="dialog-description"],
-html.theme-light [data-slot="dialog-content"] [data-slot="dialog-description"] {
-  color: #334155 !important;
-}
-
-/* Background canvas particles in light mode */
-html.theme-light canvas {
-  opacity: 0.65;
-  filter: contrast(1.25);
-}
-
-/* Subtle glow reductions in light mode */
-html.theme-light [class*="blur-3xl"] {
-  opacity: 0.35 !important;
-}
-
-/* Mobile drawer in light mode */
-html.theme-light [data-slot="sheet-content"] {
-  background-color: #ffffff !important;
-  color: #0f172a !important;
-  border-color: #e2e8f0 !important;
 }

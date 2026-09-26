@@ -113,7 +113,7 @@ export function listStudentRegistrations(password: string): Promise<StudentRegis
   return getJsonWithPassword("/api/admin/students", password);
 }
 
-export type SubmissionSlug = "ideas" | "speakers" | "expo" | "awards" | "hackathon";
+export type SubmissionSlug = "ideas" | "speakers" | "expo" | "oem" | "awards" | "individual" | "hackathon";
 
 export type SubmissionRow = { id: number; createdAt: string } & Record<string, string | number>;
 
@@ -126,4 +126,24 @@ export function submitForm(
 
 export function listSubmissions(slug: SubmissionSlug, password: string): Promise<SubmissionRow[]> {
   return getJsonWithPassword(`/api/admin/submissions/${slug}`, password);
+}
+
+export type HackathonRegistrationRow = {
+  id: number;
+  name: string;
+  institution: string;
+  email: string;
+  mobile: string;
+  teamName: string;
+  teamSize: string;
+  createdAt: string;
+};
+
+export type HackathonAdminData = {
+  registrations: HackathonRegistrationRow[];
+  interestedStudents: StudentRegistrationRow[];
+};
+
+export function listHackathon(password: string): Promise<HackathonAdminData> {
+  return getJsonWithPassword("/api/admin/hackathon", password);
 }

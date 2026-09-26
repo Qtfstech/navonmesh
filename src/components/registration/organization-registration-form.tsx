@@ -43,7 +43,12 @@ const emptyForm: FormState = {
   nominateIndividualAward: "",
 };
 
-export function OrganizationRegistrationForm() {
+export function OrganizationRegistrationForm({
+  onSuccess,
+}: {
+  /** Called after a successful submission that doesn't redirect to /sponsorship. */
+  onSuccess?: () => void;
+} = {}) {
   const navigate = useNavigate();
   const [form, setForm] = useState<FormState>(emptyForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
@@ -84,6 +89,8 @@ export function OrganizationRegistrationForm() {
       setErrors({});
       if (wantsToSponsor) {
         void navigate({ to: "/sponsorship" });
+      } else {
+        onSuccess?.();
       }
     } catch (error) {
       console.error(error);
@@ -220,7 +227,7 @@ export function OrganizationRegistrationForm() {
         type="submit"
         size="lg"
         disabled={submitting}
-        className="justify-self-start rounded-full bg-signal text-paper hover:bg-signal/90"
+        className="w-full rounded-full bg-signal text-paper hover:bg-signal/90 sm:w-auto sm:justify-self-start"
       >
         {submitting ? "Submitting…" : "Register organization"}
       </Button>

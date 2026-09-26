@@ -5,6 +5,8 @@ import {
   Store,
   Trophy,
   Code2,
+  Factory,
+  User,
   type LucideIcon,
 } from "lucide-react";
 import type { SubmissionSlug } from "@/lib/api";
@@ -30,6 +32,10 @@ export type SubmissionForm = {
   submitLabel: string;
   successMessage: string;
   fields: FormField[];
+  /** Last date to submit, shown on the Get involved card and in the form popup. */
+  deadline?: string;
+  /** False for forms opened elsewhere (e.g. the Register popup) rather than as a Get involved card. */
+  listed?: boolean;
 };
 
 export const domains = [
@@ -44,9 +50,41 @@ export const domains = [
   "Other",
 ] as const;
 
+export const manufacturerTypes = [
+  "Telecom & Networking Equipment",
+  "Electronics & Components",
+  "Electrical Equipment",
+  "Industrial Machinery & Automation",
+  "Automotive & EV",
+  "Renewable Energy Equipment",
+  "Medical Devices",
+  "Agricultural Equipment",
+  "Other",
+] as const;
+
+export const indianStates = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat",
+  "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh",
+  "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan",
+  "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+  "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi",
+  "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
+] as const;
+
+export const professions = [
+  "Student",
+  "Researcher / Faculty",
+  "Working Professional",
+  "Startup Founder / Entrepreneur",
+  "Investor",
+  "Government / PSU Official",
+  "Other",
+] as const;
+
 export const submissionForms: SubmissionForm[] = [
   {
     slug: "ideas",
+    deadline: "25 Oct 2026",
     title: "Pitch an Innovation",
     intro:
       "Present your novel technology or startup idea to industry leaders, BSNL partners, and academic mentors.",
@@ -69,6 +107,7 @@ export const submissionForms: SubmissionForm[] = [
   },
   {
     slug: "speakers",
+    deadline: "10 Oct 2026",
     title: "Call for Speakers",
     intro:
       "Nominate yourself or a thought leader to speak in technical keynotes, panels, and workshops at Navonmesh 2026.",
@@ -92,6 +131,7 @@ export const submissionForms: SubmissionForm[] = [
   },
   {
     slug: "expo",
+    deadline: "25 Oct 2026",
     title: "Exhibit at Tech Expo",
     intro:
       "Book an exhibition booth or demo space to showcase hardware, enterprise software, and solutions to buyers and BSNL integrators.",
@@ -112,6 +152,27 @@ export const submissionForms: SubmissionForm[] = [
       { key: "boothSize", label: "Preferred Stall Size", kind: "select", required: true, options: ["Tabletop", "Standard (3m × 3m)", "Large (6m × 3m)", "Custom"] },
       { key: "website", label: "Company Website", kind: "url", required: false, placeholder: "https://example.com" },
       { key: "description", label: "Demo & Power / Spatial Requirements", kind: "longtext", required: true, wide: true, placeholder: "Outline what you will display and any specific power/space needs..." },
+    ],
+  },
+  {
+    slug: "oem",
+    deadline: "15 Oct 2026",
+    title: "OEM Registration",
+    intro:
+      "Register your manufacturing company to showcase products, meet buyers and connect with integrators across every summit domain.",
+    audience: "Manufacturers (OEMs)",
+    summary:
+      "Original equipment manufacturers across telecom, electronics, automation, energy and more — get listed and matched to the right pavilion.",
+    icon: Factory,
+    submitLabel: "Register as OEM",
+    successMessage: "OEM registration received! Our industry team will reach out shortly.",
+    fields: [
+      { key: "companyName", label: "Company Name", kind: "text", required: true, placeholder: "e.g. Apex Electronics Pvt Ltd" },
+      { key: "manufacturerType", label: "Manufacturer Type", kind: "select", required: true, options: manufacturerTypes },
+      { key: "state", label: "State", kind: "select", required: true, options: indianStates },
+      { key: "contactPerson", label: "Contact Person", kind: "text", required: true, placeholder: "e.g. Anita Desai" },
+      { key: "website", label: "Website", kind: "url", required: false, placeholder: "https://example.com" },
+      { key: "email", label: "Email", kind: "email", required: true, placeholder: "contact@company.com" },
     ],
   },
   {
@@ -137,16 +198,38 @@ export const submissionForms: SubmissionForm[] = [
     ],
   },
   {
-    slug: "hackathon",
-    title: "Navonmesh Hackathon 2026",
+    slug: "individual",
+    listed: false,
+    title: "Individual Registration",
     intro:
-      "Compete in building real-world automation, 5G applications, and IoT systems. Winners earn an MoU pathway with BSNL!",
+      "Attend Navonmesh 2026 in your own capacity — as a student, researcher, professional, founder or investor.",
+    audience: "Individuals",
+    summary: "Register yourself as a delegate for the three-day summit.",
+    icon: User,
+    submitLabel: "Register",
+    successMessage: "Registration received — our team will follow up shortly.",
+    fields: [
+      { key: "fullName", label: "Full name", kind: "text", required: true, placeholder: "e.g. Priya Reddy" },
+      { key: "profession", label: "You are a", kind: "select", required: true, options: professions },
+      { key: "organization", label: "Organization / Institution", kind: "text", required: false, placeholder: "Company or college (optional)" },
+      { key: "areaOfInterest", label: "Area of interest", kind: "select", required: true, options: domains },
+      { key: "mobile", label: "Mobile number", kind: "mobile", required: true, placeholder: "+91 90000 00000" },
+      { key: "email", label: "Email", kind: "email", required: true, placeholder: "you@example.com" },
+      { key: "nominateIndividualAward", label: "Nominate yourself for an individual award?", kind: "radio", required: true, options: ["yes", "no"] },
+    ],
+  },
+  {
+    slug: "hackathon",
+    deadline: "25 Oct 2026",
+    title: "Navonmesh HackFest",
+    intro:
+      "Compete in building real-world automation, 5G applications, and IoT systems alongside industry and BSNL mentors.",
     audience: "Students & Developers",
     summary:
-      "A fast-paced build sprint solving industry problem statements. Entry fee ₹500/participant with direct BSNL SI tie-up opportunity.",
+      "A fast-paced build sprint solving industry problem statements. Entry fee ₹499/- per participant.",
     icon: Code2,
-    submitLabel: "Register for Hackathon",
-    successMessage: "Hackathon registration received! Check your inbox for problem statements and logistics.",
+    submitLabel: "Register for HackFest",
+    successMessage: "HackFest registration received! Check your inbox for problem statements and logistics.",
     fields: [
       { key: "name", label: "Lead Participant Name", kind: "text", required: true, placeholder: "Team lead's name" },
       { key: "institution", label: "College / University Name", kind: "text", required: true, placeholder: "e.g. CMR Technical Campus" },
@@ -154,8 +237,6 @@ export const submissionForms: SubmissionForm[] = [
       { key: "mobile", label: "Mobile Number (WhatsApp)", kind: "mobile", required: true, placeholder: "+91 98765 43210" },
       { key: "teamName", label: "Team Name (Optional)", kind: "text", required: false, placeholder: "e.g. CyberVanguard" },
       { key: "teamSize", label: "Team Size", kind: "select", required: true, options: ["1 (solo)", "2", "3", "4"] },
-      { key: "track", label: "Preferred Hackathon Track", kind: "select", required: true, options: domains },
-      { key: "experience", label: "Tech Stack & Past Projects", kind: "longtext", required: false, wide: true, placeholder: "Mention relevant programming languages, hardware kits, or previous hackathons..." },
     ],
   },
 ];

@@ -113,11 +113,11 @@ export function StudentRegistrationForm() {
 
       <div className="grid gap-6 border-t border-navy/10 pt-6 sm:grid-cols-2">
         <YesNoField
-          label="Interested to participate in the Hackathon?"
+          label="Interested to participate in the HackFest?"
           name="hackathonInterest"
           value={form.hackathonInterest as "yes" | "no" | ""}
           onChange={(v) => updateField("hackathonInterest", v)}
-          note="₹500 entry fee — payment details will follow by email."
+          note="₹499/- entry fee — payment details will follow by email."
           error={errors.hackathonInterest}
         />
 
@@ -134,7 +134,7 @@ export function StudentRegistrationForm() {
         type="submit"
         size="lg"
         disabled={submitting}
-        className="justify-self-start rounded-full bg-signal text-paper hover:bg-signal/90"
+        className="w-full rounded-full bg-signal text-paper hover:bg-signal/90 sm:w-auto sm:justify-self-start"
       >
         {submitting ? "Submitting…" : "Register"}
       </Button>

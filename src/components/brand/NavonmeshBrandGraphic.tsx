@@ -1,24 +1,18 @@
 import React from "react";
 
+// Wordmark colours follow the Navonmesh logo: blue → green → orange.
 export function NavonmeshBrandGraphic({ className = "" }: { className?: string }) {
   return (
     <div className={`relative isolate flex flex-col items-center select-none w-full ${className}`}>
-      {/* National Tech Conclave Top Ribbon */}
-      <div className="conclave-top-ribbon mb-1.5 sm:mb-2 inline-flex items-center gap-2 rounded-full border border-white/20 bg-night-deep/90 px-3.5 sm:px-4 py-0.5 text-[10px] sm:text-xs font-mono font-bold tracking-widest backdrop-blur-md shadow-lg shadow-black/50">
-        <span className="flex items-center gap-1" aria-hidden="true">
-          <span className="size-1.5 rounded-full bg-[#FF671F] shadow-sm shadow-[#FF671F]" />
-          <span className="size-1.5 rounded-full bg-white shadow-sm" />
-          <span className="size-1.5 rounded-full bg-[#10B981] shadow-sm shadow-[#10B981]" />
-        </span>
-        <span className="conclave-ribbon-title bg-gradient-to-r from-[#FFA143] via-white to-emerald-300 bg-clip-text text-transparent uppercase">
-          NATIONAL TECH CONCLAVE
-        </span>
-        <span className="conclave-ribbon-divider text-white/30 font-light">|</span>
-        <span className="text-signal font-mono">2026 EDITION</span>
-      </div>
-
-      {/* Main Big Graphic Title SVG - Flag Coloured High-Impact Typography */}
-      <div className="relative w-full max-w-[390px] sm:max-w-[580px] md:max-w-[760px] lg:max-w-[900px] flex items-center justify-center">
+      {/* Main Big Graphic Title SVG */}
+      <div className="relative w-full max-w-[390px] sm:max-w-[580px] md:max-w-[760px] lg:max-w-[900px] short:max-w-[620px] flex flex-col items-center justify-center">
+        {/* Small Navonmesh logo in its own row at the top-left corner, so it never overlaps the wordmark */}
+        <img
+          src="/navonmesh-logo.jpeg"
+          alt="Navonmesh — Ideas, Innovation, Impact"
+          className="self-start h-7 w-auto rounded-md bg-white object-contain shadow-xl ring-1 ring-white/30 sm:h-9 md:h-11"
+        />
+        <div className="relative w-full">
         <svg
           viewBox="0 0 880 155"
           fill="none"
@@ -26,53 +20,28 @@ export function NavonmeshBrandGraphic({ className = "" }: { className?: string }
           className="w-full h-auto drop-shadow-[0_12px_40px_rgba(0,0,0,0.95)]"
         >
           <defs>
-            {/* National Flag Tricolor Gradient: Saffron -> White -> India Green */}
-            <linearGradient id="flagTricolor" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#FF671F" />
-              <stop offset="14%" stopColor="#FF9933" />
-              <stop offset="28%" stopColor="#FFA64D" />
-              <stop offset="42%" stopColor="#FFFFFF" />
-              <stop offset="50%" stopColor="#F8FAFC" />
-              <stop offset="58%" stopColor="#FFFFFF" />
-              <stop offset="72%" stopColor="#34D399" />
-              <stop offset="86%" stopColor="#10B981" />
-              <stop offset="100%" stopColor="#046A38" />
+            {/* Logo gradient: Blue -> Green -> Orange */}
+            <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#1565C0" />
+              <stop offset="18%" stopColor="#1E88E5" />
+              <stop offset="36%" stopColor="#1FA2B8" />
+              <stop offset="52%" stopColor="#43A047" />
+              <stop offset="66%" stopColor="#8BC34A" />
+              <stop offset="82%" stopColor="#F7941D" />
+              <stop offset="100%" stopColor="#EF6C00" />
             </linearGradient>
 
-            {/* National Flag Tricolor Gradient for Light Mode (High Contrast with Ashoka Blue Accent) */}
-            <linearGradient id="flagTricolorLight" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#EA580C" />
-              <stop offset="18%" stopColor="#F97316" />
-              <stop offset="34%" stopColor="#FB923C" />
-              <stop offset="44%" stopColor="#1E3A8A" />
-              <stop offset="50%" stopColor="#0F172A" />
-              <stop offset="56%" stopColor="#1E3A8A" />
-              <stop offset="68%" stopColor="#10B981" />
-              <stop offset="84%" stopColor="#059669" />
-              <stop offset="100%" stopColor="#047857" />
-            </linearGradient>
-
-            {/* Specular Top Shimmer Gradient */}
-            <linearGradient id="specularOverlay" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.7)" />
-              <stop offset="45%" stopColor="rgba(255,255,255,0.15)" />
-              <stop offset="70%" stopColor="rgba(0,0,0,0.25)" />
-              <stop offset="100%" stopColor="rgba(0,0,0,0.6)" />
-            </linearGradient>
-
-            {/* Tricolor Laser Line Gradient */}
-            <linearGradient id="laserTricolor" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="rgba(255, 103, 31, 0)" />
-              <stop offset="20%" stopColor="#FF671F" />
-              <stop offset="40%" stopColor="#FFA143" />
-              <stop offset="50%" stopColor="#FFFFFF" />
-              <stop offset="60%" stopColor="#34D399" />
-              <stop offset="80%" stopColor="#10B981" />
-              <stop offset="100%" stopColor="rgba(4, 106, 56, 0)" />
+            {/* Logo-coloured Laser Line Gradient */}
+            <linearGradient id="laserBrand" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgba(21, 101, 192, 0)" />
+              <stop offset="20%" stopColor="#1E88E5" />
+              <stop offset="50%" stopColor="#43A047" />
+              <stop offset="80%" stopColor="#F7941D" />
+              <stop offset="100%" stopColor="rgba(239, 108, 0, 0)" />
             </linearGradient>
 
             {/* Vibrant Glow Filter */}
-            <filter id="tricolorGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <filter id="brandGlow" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="8" result="blur" />
               <feMerge>
                 <feMergeNode in="blur" />
@@ -85,16 +54,16 @@ export function NavonmeshBrandGraphic({ className = "" }: { className?: string }
           <line x1="40" y1="22" x2="840" y2="22" stroke="rgba(255, 255, 255, 0.12)" strokeDasharray="4 8" strokeWidth="1" />
           <line x1="40" y1="130" x2="840" y2="130" stroke="rgba(255, 255, 255, 0.12)" strokeDasharray="4 8" strokeWidth="1" />
 
-          {/* Left Decorative Saffron Tech Caliper */}
-          <path d="M 50 38 L 30 38 L 30 115 L 50 115" stroke="#FF9933" strokeWidth="2.5" strokeOpacity="0.8" fill="none" />
-          <circle cx="30" cy="76" r="3" fill="#FF671F" />
+          {/* Left Decorative Blue Tech Caliper */}
+          <path d="M 50 38 L 30 38 L 30 115 L 50 115" stroke="#1E88E5" strokeWidth="2.5" strokeOpacity="0.8" fill="none" />
+          <circle cx="30" cy="76" r="3" fill="#1565C0" />
 
-          {/* Right Decorative Green Tech Caliper */}
-          <path d="M 830 38 L 850 38 L 850 115 L 830 115" stroke="#10B981" strokeWidth="2.5" strokeOpacity="0.8" fill="none" />
-          <circle cx="850" cy="76" r="3" fill="#046A38" />
+          {/* Right Decorative Orange Tech Caliper */}
+          <path d="M 830 38 L 850 38 L 850 115 L 830 115" stroke="#F7941D" strokeWidth="2.5" strokeOpacity="0.8" fill="none" />
+          <circle cx="850" cy="76" r="3" fill="#EF6C00" />
 
-          {/* Dark Mode Wordmark (Default) */}
-          <g className="navonmesh-wordmark-dark">
+          {/* Wordmark */}
+          <g>
             <text
               x="440"
               y="112"
@@ -103,8 +72,8 @@ export function NavonmeshBrandGraphic({ className = "" }: { className?: string }
               fontSize="106"
               fontWeight="900"
               letterSpacing="3"
-              fill="url(#flagTricolor)"
-              filter="url(#tricolorGlow)"
+              fill="url(#brandGradient)"
+              filter="url(#brandGlow)"
               className="tracking-wider uppercase"
             >
               NAVONMESH
@@ -126,52 +95,40 @@ export function NavonmeshBrandGraphic({ className = "" }: { className?: string }
             </text>
           </g>
 
-          {/* Light Mode Wordmark (High-Contrast Saffron-Chakra-Green) */}
-          <g className="navonmesh-wordmark-light">
-            <text
-              x="440"
-              y="112"
-              textAnchor="middle"
-              fontFamily="var(--font-display, system-ui, -apple-system, sans-serif)"
-              fontSize="106"
-              fontWeight="900"
-              letterSpacing="3"
-              fill="url(#flagTricolorLight)"
-              stroke="rgba(15, 23, 42, 0.2)"
-              strokeWidth="1.5"
-              className="tracking-wider uppercase"
-            >
-              NAVONMESH
-            </text>
-          </g>
+          {/* Central Laser Waveguide Line in logo colours */}
+          <line x1="60" y1="132" x2="820" y2="132" stroke="url(#laserBrand)" strokeWidth="3" strokeLinecap="round" />
 
-          {/* Central Laser Waveguide Line with National Colors */}
-          <line x1="60" y1="132" x2="820" y2="132" stroke="url(#laserTricolor)" strokeWidth="3" strokeLinecap="round" />
-
-          {/* Core Telemetry Signal Nodes: Saffron, White, Green */}
-          <circle cx="60" cy="132" r="3.5" fill="#FF671F" />
-          <circle cx="250" cy="132" r="2.5" fill="#FFA143" />
-          <circle cx="440" cy="132" r="4.5" fill="#FFFFFF" stroke="#000080" strokeWidth="1.5" />
-          <circle cx="630" cy="132" r="2.5" fill="#34D399" />
-          <circle cx="820" cy="132" r="3.5" fill="#046A38" />
+          {/* Signal Nodes: Blue, Green, Orange */}
+          <circle cx="60" cy="132" r="3.5" fill="#1565C0" />
+          <circle cx="250" cy="132" r="2.5" fill="#1E88E5" />
+          <circle cx="440" cy="132" r="4.5" fill="#43A047" stroke="#FFFFFF" strokeWidth="1.5" />
+          <circle cx="630" cy="132" r="2.5" fill="#F7941D" />
+          <circle cx="820" cy="132" r="3.5" fill="#EF6C00" />
         </svg>
 
-        {/* Live Holographic 2026 Floating Chip */}
-        <div className="absolute -top-1 sm:-top-2 -right-1 sm:right-1 md:right-4">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-signal/60 bg-night-deep/95 px-2.5 sm:px-3 py-0.5 sm:py-1 font-mono text-[9px] sm:text-[11px] font-extrabold text-signal shadow-xl shadow-signal/30 backdrop-blur-md ring-1 ring-white/20">
-            <span className="size-1.5 sm:size-2 rounded-full bg-signal animate-ping" />
+        {/* Live Holographic 2026 Chip, tucked against the end of the wordmark */}
+        <div className="absolute -top-2 sm:-top-3 right-[10%]">
+          <span className="inline-flex items-center gap-1 rounded-full border border-signal/60 bg-night-deep/95 px-1.5 sm:px-2 py-px font-mono text-[8px] sm:text-[9px] font-extrabold text-signal shadow-lg shadow-signal/30 backdrop-blur-md ring-1 ring-white/20">
+            <span className="size-1 sm:size-1.5 rounded-full bg-signal animate-ping" />
             2026
           </span>
         </div>
+        </div>
       </div>
 
-      {/* Directly below NAVONMESH: An Initiative by Koushalam */}
-      <div className="mt-1 sm:mt-1.5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-night-deep/90 px-4 sm:px-5 py-1 text-xs sm:text-sm font-medium backdrop-blur-md shadow-md shadow-black/40">
-        <span className="text-night-foreground/70 tracking-wide text-xs sm:text-sm">
+      {/* Theme line directly below NAVONMESH */}
+      <p className="mt-1.5 sm:mt-2 font-display text-sm font-semibold tracking-wide text-white/90 sm:text-lg">
+        Catalysing India’s 5G Vision, Industry 4.0 &amp; Beyond
+      </p>
+
+      {/* Highlighted BSNL Koushalam initiative tagline */}
+      <div className="mt-2 inline-flex items-center gap-2 rounded-full border-2 border-amber-300/70 bg-gradient-to-r from-amber-500/25 via-night-deep/95 to-emerald-500/25 px-5 sm:px-6 py-1.5 backdrop-blur-md shadow-[0_0_28px_rgba(252,211,77,0.35)] ring-1 ring-white/20">
+        <span className="size-2 rounded-full bg-amber-300 animate-pulse" />
+        <span className="text-white/90 font-semibold tracking-wide text-xs sm:text-base">
           An initiative by
         </span>
-        <span className="font-display font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-white to-emerald-300">
-          Koushalam
+        <span className="font-display text-sm sm:text-lg font-black uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-white to-emerald-300">
+          BSNL Koushalam
         </span>
       </div>
     </div>

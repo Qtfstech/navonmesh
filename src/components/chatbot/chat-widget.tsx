@@ -12,12 +12,12 @@ type Message = {
 };
 
 const FALLBACK_TEXT =
-  "I don't have an answer for that yet. Try asking about the venue, dates, registration, fees, sponsorship or the hackathon — or use the Register section for anything else.";
+  "I don't have an answer for that yet. Try asking about the venue, dates, registration, fees, sponsorship or the HackFest — or use the Register section for anything else.";
 
 const QUICK_QUESTIONS: Array<{ label: string; entryId: string }> = [
   { label: "Venue & directions", entryId: "venue" },
   { label: "How do I register?", entryId: "register-org" },
-  { label: "Hackathon fee", entryId: "fee-hackathon" },
+  { label: "HackFest fee", entryId: "fee-hackathon" },
   { label: "Sponsorship", entryId: "sponsorship" },
 ];
 
@@ -37,7 +37,7 @@ export function ChatWidget() {
     {
       id: "greeting",
       role: "bot",
-      text: "Hi! I'm the Navonmesh Assistant. Ask me about the venue, dates, registration, fees, sponsorship or the hackathon.",
+      text: "Hi! I'm the Navonmesh Assistant. Ask me about the venue, dates, registration, fees, sponsorship or the HackFest.",
     },
   ]);
 

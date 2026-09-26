@@ -52,8 +52,8 @@ const CONCLAVE_PHOTOS: ConclavePhoto[] = [
   },
   {
     id: "hackathon-arena",
-    title: "24-Hour NAVONMESH Hackathon Arena",
-    tag: "Student Hackathon",
+    title: "24-Hour Navonmesh HackFest Arena",
+    tag: "Navonmesh HackFest",
     location: "Koushalam Center of Excellence",
     metric: "500+ Finalist Coders",
     caption:
@@ -143,7 +143,7 @@ export function ConclaveEventScroll() {
               Inside Navonmesh Summit 2026
             </h2>
             <p className="mt-1 text-sm text-night-foreground/65">
-              Auditoriums, student hackathon arenas, and exhibition pavilions across CMR Medchal campus
+              Auditoriums, HackFest arenas, and exhibition pavilions across CMR Medchal campus
             </p>
           </div>
 

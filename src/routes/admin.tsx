@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Download, LogOut, RefreshCw } from "lucide-react";
+import { Code2, Download, LogOut, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,15 +14,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  listHackathon,
   listOrganizationRegistrations,
   listStudentRegistrations,
   listSubmissions,
+  type HackathonAdminData,
+  type HackathonRegistrationRow,
   type OrganizationRegistrationRow,
   type StudentRegistrationRow,
   type SubmissionRow,
   type SubmissionSlug,
 } from "@/lib/api";
-import { submissionForms, type SubmissionForm } from "@/data/submission-forms";
+import { submissionForms as allSubmissionForms, type SubmissionForm } from "@/data/submission-forms";
+
+// Hackathon has its own admin section; the rest share the generic submissions tab.
+const submissionForms = allSubmissionForms.filter((form) => form.slug !== "hackathon");
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -109,9 +115,9 @@ const STUDENT_HEADER = [
   "Registered at",
 ];
 
-function exportStudents(rows: StudentRegistrationRow[]) {
+function exportStudents(rows: StudentRegistrationRow[], filenamePrefix = "navonmesh-students") {
   downloadCsv(
-    "navonmesh-students",
+    filenamePrefix,
     STUDENT_HEADER,
     rows.map((row) => [
       String(row.id),
@@ -121,6 +127,34 @@ function exportStudents(rows: StudentRegistrationRow[]) {
       row.mobile,
       yesNoLabel(row.hackathonInterest),
       yesNoLabel(row.presentPrototype),
+      row.createdAt,
+    ]),
+  );
+}
+
+const HACKATHON_HEADER = [
+  "ID",
+  "Lead participant",
+  "Institution",
+  "Email",
+  "Mobile",
+  "Team name",
+  "Team size",
+  "Registered at",
+];
+
+function exportHackathon(rows: HackathonRegistrationRow[]) {
+  downloadCsv(
+    "navonmesh-hackathon",
+    HACKATHON_HEADER,
+    rows.map((row) => [
+      String(row.id),
+      row.name,
+      row.institution,
+      row.email,
+      row.mobile,
+      row.teamName,
+      row.teamSize,
       row.createdAt,
     ]),
   );
@@ -139,6 +173,132 @@ function exportSubmissions(form: SubmissionForm, rows: SubmissionRow[]) {
 }
 
 type SubmissionRows = Partial<Record<SubmissionSlug, SubmissionRow[]>>;
+
+const emptyHackathon: HackathonAdminData = { registrations: [], interestedStudents: [] };
+
+function HackathonTab({ data, loading }: { data: HackathonAdminData; loading: boolean }) {
+  const { registrations, interestedStudents } = data;
+  const participants = registrations.reduce((n, row) => n + (parseInt(row.teamSize, 10) || 0), 0);
+  const stats: [string, number][] = [
+    ["Team registrations", registrations.length],
+    ["Total participants", participants],
+    ["Interested students", interestedStudents.length],
+  ];
+
+  return (
+    <TabsContent value="hackathon" className="mt-6">
+      <div className="grid gap-4 sm:grid-cols-3">
+        {stats.map(([label, value]) => (
+          <div key={label} className="rounded-lg border border-navy/10 bg-white p-5">
+            <p className="text-xs font-bold uppercase tracking-[.14em] text-navy/50">{label}</p>
+            <p className="mt-2 font-display text-3xl font-semibold">{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="font-display text-xl font-semibold">HackFest registrations</h2>
+          <p className="text-sm text-navy/60">Teams registered through the HackFest form.</p>
+        </div>
+        <Button
+          onClick={() => exportHackathon(registrations)}
+          disabled={registrations.length === 0}
+          className="rounded-full bg-signal text-paper hover:bg-signal/90"
+        >
+          <Download className="size-4" />
+          Export to Excel
+        </Button>
+      </div>
+      <div className="mt-4 overflow-hidden rounded-lg border border-navy/10 bg-white">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Lead participant</TableHead>
+              <TableHead>Institution</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Mobile</TableHead>
+              <TableHead>Team name</TableHead>
+              <TableHead>Team size</TableHead>
+              <TableHead>Registered at</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {registrations.length === 0 && !loading && (
+              <TableRow>
+                <TableCell colSpan={7} className="py-10 text-center text-navy/50">
+                  No hackathon registrations yet.
+                </TableCell>
+              </TableRow>
+            )}
+            {registrations.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell className="font-medium">{row.name}</TableCell>
+                <TableCell>{row.institution}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.mobile}</TableCell>
+                <TableCell>{row.teamName || <span className="text-navy/30">—</span>}</TableCell>
+                <TableCell>{row.teamSize}</TableCell>
+                <TableCell className="whitespace-nowrap">{formatDate(row.createdAt)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="mt-10 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="font-display text-xl font-semibold">Interested students</h2>
+          <p className="text-sm text-navy/60">
+            Students who said "Yes" to the HackFest on the student registration form.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => exportStudents(interestedStudents, "navonmesh-hackathon-interested")}
+          disabled={interestedStudents.length === 0}
+          className="rounded-full"
+        >
+          <Download className="size-4" />
+          Export to Excel
+        </Button>
+      </div>
+      <div className="mt-4 overflow-hidden rounded-lg border border-navy/10 bg-white">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Institution</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Mobile</TableHead>
+              <TableHead>Present prototype?</TableHead>
+              <TableHead>Registered at</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {interestedStudents.length === 0 && !loading && (
+              <TableRow>
+                <TableCell colSpan={6} className="py-10 text-center text-navy/50">
+                  No interested students yet.
+                </TableCell>
+              </TableRow>
+            )}
+            {interestedStudents.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell className="font-medium">{row.name}</TableCell>
+                <TableCell>{row.institution}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.mobile}</TableCell>
+                <TableCell>{yesNoLabel(row.presentPrototype)}</TableCell>
+                <TableCell className="whitespace-nowrap">{formatDate(row.createdAt)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </TabsContent>
+  );
+}
 
 function SubmissionsTab({
   form,
@@ -214,6 +374,7 @@ function AdminPage() {
   const [orgRows, setOrgRows] = useState<OrganizationRegistrationRow[]>([]);
   const [studentRows, setStudentRows] = useState<StudentRegistrationRow[]>([]);
   const [submissionRows, setSubmissionRows] = useState<SubmissionRows>({});
+  const [hackathon, setHackathon] = useState<HackathonAdminData>(emptyHackathon);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -221,13 +382,15 @@ function AdminPage() {
     setLoading(true);
     setError(null);
     try {
-      const [organizations, students, ...submissions] = await Promise.all([
+      const [organizations, students, hackathonData, ...submissions] = await Promise.all([
         listOrganizationRegistrations(pwd),
         listStudentRegistrations(pwd),
+        listHackathon(pwd),
         ...submissionForms.map((form) => listSubmissions(form.slug, pwd)),
       ]);
       setOrgRows(organizations);
       setStudentRows(students);
+      setHackathon(hackathonData);
       setSubmissionRows(
         Object.fromEntries(submissionForms.map((form, i) => [form.slug, submissions[i] ?? []])),
       );
@@ -251,6 +414,7 @@ function AdminPage() {
     setOrgRows([]);
     setStudentRows([]);
     setSubmissionRows({});
+    setHackathon(emptyHackathon);
   }
 
   if (!authedPassword) {
@@ -303,6 +467,7 @@ function AdminPage() {
             <h1 className="mt-2 font-display text-3xl font-semibold sm:text-4xl">Registrations</h1>
             <p className="mt-1 text-sm text-navy/60">
               {orgRows.length} organizations · {studentRows.length} students ·{" "}
+              {hackathon.registrations.length} HackFest teams ·{" "}
               {submissionForms.reduce((n, f) => n + (submissionRows[f.slug]?.length ?? 0), 0)} form
               submissions
             </p>
@@ -333,6 +498,10 @@ function AdminPage() {
             </TabsTrigger>
             <TabsTrigger value="students" className="rounded-full">
               Students ({studentRows.length})
+            </TabsTrigger>
+            <TabsTrigger value="hackathon" className="rounded-full">
+              <Code2 className="size-4" />
+              HackFest ({hackathon.registrations.length})
             </TabsTrigger>
             {submissionForms.map((form) => (
               <TabsTrigger key={form.slug} value={form.slug} className="rounded-full">
@@ -446,6 +615,7 @@ function AdminPage() {
               </Table>
             </div>
           </TabsContent>
+          <HackathonTab data={hackathon} loading={loading} />
           {submissionForms.map((form) => (
             <SubmissionsTab
               key={form.slug}

@@ -33,12 +33,22 @@ function emptyValues(form: SubmissionForm): Values {
 export function SubmissionFormDialog({
   form,
   children,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   form: SubmissionForm;
-  /** The element that opens the popup (rendered with `asChild`). */
-  children: ReactNode;
+  /** The element that opens the popup (rendered with `asChild`). Omit when controlled. */
+  children?: ReactNode;
+  /** Controlled mode (e.g. a /speakers page that shows the form straight away). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const open = controlledOpen ?? uncontrolledOpen;
+  const setOpen = (next: boolean) => {
+    setUncontrolledOpen(next);
+    onOpenChange?.(next);
+  };
   const [values, setValues] = useState<Values>(() => emptyValues(form));
   const [errors, setErrors] = useState<Values>({});
   const [submitting, setSubmitting] = useState(false);
@@ -88,14 +98,17 @@ export function SubmissionFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-h-[92svh] overflow-y-auto bg-paper text-navy sm:max-w-2xl">
+      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
+      <DialogContent className="bg-paper text-navy sm:max-w-2xl">
         <DialogHeader>
           <span className="grid size-11 place-items-center rounded-full bg-signal/10 text-signal">
             <Icon className="size-5" />
           </span>
-          <DialogTitle className="mt-2 font-display text-2xl">{form.title}</DialogTitle>
+          <DialogTitle className="mt-2 pr-6 font-display text-xl sm:text-2xl">{form.title}</DialogTitle>
           <DialogDescription className="text-navy/65">{form.intro}</DialogDescription>
+          {form.deadline && (
+            <p className="text-xs font-semibold text-signal">Last date to apply: {form.deadline}</p>
+          )}
         </DialogHeader>
 
         <form onSubmit={handleSubmit} noValidate className="grid gap-5">
@@ -116,7 +129,7 @@ export function SubmissionFormDialog({
             type="submit"
             size="lg"
             disabled={submitting}
-            className="justify-self-start rounded-full bg-signal text-paper hover:bg-signal/90"
+            className="w-full rounded-full bg-signal text-paper hover:bg-signal/90 sm:w-auto sm:justify-self-start"
           >
             {submitting ? "Submitting…" : form.submitLabel}
           </Button>

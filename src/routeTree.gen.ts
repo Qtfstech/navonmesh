@@ -11,7 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AwardsRouteImport } from './routes/awards'
+import { Route as HackathonRouteImport } from './routes/hackathon'
+import { Route as OemRouteImport } from './routes/oem'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as SpeakersRouteImport } from './routes/speakers'
 import { Route as SponsorshipRouteImport } from './routes/sponsorship'
+import { Route as StallsRouteImport } from './routes/stalls'
+import { Route as StartupPitchesRouteImport } from './routes/startup-pitches'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,40 +30,134 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AwardsRoute = AwardsRouteImport.update({
+  id: '/awards',
+  path: '/awards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HackathonRoute = HackathonRouteImport.update({
+  id: '/hackathon',
+  path: '/hackathon',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OemRoute = OemRouteImport.update({
+  id: '/oem',
+  path: '/oem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpeakersRoute = SpeakersRouteImport.update({
+  id: '/speakers',
+  path: '/speakers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SponsorshipRoute = SponsorshipRouteImport.update({
   id: '/sponsorship',
   path: '/sponsorship',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StallsRoute = StallsRouteImport.update({
+  id: '/stalls',
+  path: '/stalls',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StartupPitchesRoute = StartupPitchesRouteImport.update({
+  id: '/startup-pitches',
+  path: '/startup-pitches',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/awards': typeof AwardsRoute
+  '/hackathon': typeof HackathonRoute
+  '/oem': typeof OemRoute
+  '/register': typeof RegisterRoute
+  '/speakers': typeof SpeakersRoute
   '/sponsorship': typeof SponsorshipRoute
+  '/stalls': typeof StallsRoute
+  '/startup-pitches': typeof StartupPitchesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/awards': typeof AwardsRoute
+  '/hackathon': typeof HackathonRoute
+  '/oem': typeof OemRoute
+  '/register': typeof RegisterRoute
+  '/speakers': typeof SpeakersRoute
   '/sponsorship': typeof SponsorshipRoute
+  '/stalls': typeof StallsRoute
+  '/startup-pitches': typeof StartupPitchesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/awards': typeof AwardsRoute
+  '/hackathon': typeof HackathonRoute
+  '/oem': typeof OemRoute
+  '/register': typeof RegisterRoute
+  '/speakers': typeof SpeakersRoute
   '/sponsorship': typeof SponsorshipRoute
+  '/stalls': typeof StallsRoute
+  '/startup-pitches': typeof StartupPitchesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/sponsorship'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/awards'
+    | '/hackathon'
+    | '/oem'
+    | '/register'
+    | '/speakers'
+    | '/sponsorship'
+    | '/stalls'
+    | '/startup-pitches'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/sponsorship'
-  id: '__root__' | '/' | '/admin' | '/sponsorship'
+  to:
+    | '/'
+    | '/admin'
+    | '/awards'
+    | '/hackathon'
+    | '/oem'
+    | '/register'
+    | '/speakers'
+    | '/sponsorship'
+    | '/stalls'
+    | '/startup-pitches'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/awards'
+    | '/hackathon'
+    | '/oem'
+    | '/register'
+    | '/speakers'
+    | '/sponsorship'
+    | '/stalls'
+    | '/startup-pitches'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AwardsRoute: typeof AwardsRoute
+  HackathonRoute: typeof HackathonRoute
+  OemRoute: typeof OemRoute
+  RegisterRoute: typeof RegisterRoute
+  SpeakersRoute: typeof SpeakersRoute
   SponsorshipRoute: typeof SponsorshipRoute
+  StallsRoute: typeof StallsRoute
+  StartupPitchesRoute: typeof StartupPitchesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,11 +176,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/awards': {
+      id: '/awards'
+      path: '/awards'
+      fullPath: '/awards'
+      preLoaderRoute: typeof AwardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hackathon': {
+      id: '/hackathon'
+      path: '/hackathon'
+      fullPath: '/hackathon'
+      preLoaderRoute: typeof HackathonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oem': {
+      id: '/oem'
+      path: '/oem'
+      fullPath: '/oem'
+      preLoaderRoute: typeof OemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/speakers': {
+      id: '/speakers'
+      path: '/speakers'
+      fullPath: '/speakers'
+      preLoaderRoute: typeof SpeakersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sponsorship': {
       id: '/sponsorship'
       path: '/sponsorship'
       fullPath: '/sponsorship'
       preLoaderRoute: typeof SponsorshipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stalls': {
+      id: '/stalls'
+      path: '/stalls'
+      fullPath: '/stalls'
+      preLoaderRoute: typeof StallsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/startup-pitches': {
+      id: '/startup-pitches'
+      path: '/startup-pitches'
+      fullPath: '/startup-pitches'
+      preLoaderRoute: typeof StartupPitchesRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -88,7 +238,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AwardsRoute: AwardsRoute,
+  HackathonRoute: HackathonRoute,
+  OemRoute: OemRoute,
+  RegisterRoute: RegisterRoute,
+  SpeakersRoute: SpeakersRoute,
   SponsorshipRoute: SponsorshipRoute,
+  StallsRoute: StallsRoute,
+  StartupPitchesRoute: StartupPitchesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

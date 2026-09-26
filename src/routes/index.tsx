@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowDown,
@@ -13,6 +13,7 @@ import {
   HeartPulse,
   Lightbulb,
   MapPin,
+  Megaphone,
   MousePointerClick,
   Menu,
   Network,
@@ -21,6 +22,7 @@ import {
   Rocket,
   Satellite,
   Sprout,
+  Store,
   Users,
   Wifi,
   Wind,
@@ -28,6 +30,10 @@ import {
   ShieldCheck,
   CheckCircle2,
   ChevronRight,
+  ChevronDown,
+  Code2,
+  Ticket,
+  Trophy,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -42,12 +48,20 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { OrganizationRegistrationForm } from "@/components/registration/organization-registration-form";
+import { RegistrationDialog } from "@/components/registration/registration-dialog";
+import { RegisterPromo } from "@/components/registration/register-promo";
 import { NavonmeshBrandGraphic } from "@/components/brand/NavonmeshBrandGraphic";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { ChatWidget } from "@/components/chatbot/chat-widget";
 import { SubmissionFormDialog } from "@/components/registration/submission-form-dialog";
 import { submissionForms } from "@/data/submission-forms";
+import type { SubmissionSlug } from "@/lib/api";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -60,17 +74,18 @@ import stageImage from "@/assets/navonmesh-clay-stage.png";
 import bsnlLogo from "@/assets/partners/bsnl-logo.png";
 import qtfsfLogo from "@/assets/partners/qtfsf-logo.png";
 import cmrLogo from "@/assets/partners/cmr-logo.png";
+import oemImage from "@/assets/technologies/industrial-automation.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Navonmesh Summit 2026 | National Tech Conclave" },
+      { title: "Navonmesh | Summit 2026 – National Tech Conclave, Hyderabad" },
       {
         name: "description",
         content:
-          "Explore Navonmesh Summit 2026, India's national research, innovation, startup and academia conclave in Hyderabad, 29–31 October.",
+          "Navonmesh is India's national research, innovation, startup & academia platform. Navonmesh Summit 2026: 29–31 Oct at CMR Campus, Hyderabad — 50+ exhibitors, 60+ speakers, awards and BSNL HackFest.",
       },
-      { property: "og:title", content: "Navonmesh Summit 2026 | National Tech Conclave" },
+      { property: "og:title", content: "Navonmesh | Summit 2026 – National Tech Conclave, Hyderabad" },
       {
         property: "og:description",
         content:
@@ -80,7 +95,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Index,
+  component: HomePage,
 });
 
 type Technology = {
@@ -112,7 +127,7 @@ const technologies: Technology[] = [
     label: "Connect",
     description: "Telecom equipment, network infrastructure and live technology demonstrations built for real-world deployment.",
     detail:
-      "From base stations and fiber backhaul to routers and network testbeds — this track is where equipment makers and system integrators show hardware that's actually shipping. It's built for procurement teams, telecom engineers and BSNL's System Integrator partners scouting field-ready gear, not just concept demos.",
+      "From base stations and fiber backhaul to routers and network testbeds — this track is where equipment makers and system integrators show hardware that's actually shipping. It's built for procurement teams and telecom engineers scouting field-ready gear, not just concept demos.",
     image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
     icon: Satellite,
     tags: ["Equipment", "Infrastructure", "Testbeds"],
@@ -132,9 +147,9 @@ const technologies: Technology[] = [
     number: "04",
     title: "Industrial Automation & Robotics",
     label: "Make",
-    description: "Prototype models and end-to-end automation ideas developed through workshops, live testbeds and the hackathon.",
+    description: "Prototype models and end-to-end automation ideas developed through workshops, live testbeds and the HackFest.",
     detail:
-      "Robotics arms, AGVs, PLC-driven process automation and vision-based quality control — presented as working prototypes, not slideware. This is also the direct pipeline into the NAVONMESH Hackathon 2026, where student and startup teams build automation concepts through to a live testbed demo.",
+      "Robotics arms, AGVs, PLC-driven process automation and vision-based quality control — presented as working prototypes, not slideware. This is also the direct pipeline into the Navonmesh HackFest, where student and startup teams build automation concepts through to a live testbed demo.",
     image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80",
     icon: Bot,
     tags: ["Robotics", "Automation", "Prototypes"],
@@ -223,11 +238,11 @@ const formats: Format[] = [
       "A curated exhibition floor spanning all ten technology pavilions, open across the full three days. Exhibitors get a booth, delegate footfall and a listing in the expo directory; visitors get a single walkthrough of India's innovation pipeline from lab to product.",
   },
   {
-    code: "MoU",
-    title: "MoU Signing Hub",
-    description: "Formal partnerships across startups, enterprises and academic institutions.",
+    code: "OEM",
+    title: "OEM Showcase",
+    description: "Original equipment manufacturers meeting buyers, integrators and enterprise partners.",
     detail:
-      "A dedicated space and process for formalizing partnerships on-site — startup-enterprise pilots, academia-industry research tie-ups and government-backed collaboration agreements, including the BSNL System Integrator pathway for hackathon winners.",
+      "A dedicated zone for OEMs across every pavilion — telecom, electronics, automation, energy, health and agri equipment makers — to showcase products and meet procurement teams, integrators and enterprise partners face to face.",
   },
   {
     code: "Panels",
@@ -248,30 +263,66 @@ const formats: Format[] = [
     title: "Student Immersion Tracks",
     description: "Exposure modules for diploma, undergraduate and postgraduate scholars.",
     detail:
-      "Guided walkthroughs of the expo and pavilions designed for students, plus workshops on emerging technology domains. It's the on-ramp for the hackathon and prototype-pitch tracks — come to learn, leave with a team and an idea.",
+      "Guided walkthroughs of the expo and pavilions designed for students, plus workshops on emerging technology domains. It's the on-ramp for the HackFest and prototype-pitch tracks — come to learn, leave with a team and an idea.",
   },
   {
-    code: "Hackathon",
-    title: "NAVONMESH HACKATHON 2026",
+    code: "HackFest",
+    title: "NAVONMESH HACKFEST",
     description: "Emerging-domain prototypes for end-to-end industry automation.",
     detail:
-      "A competitive build track across the summit's focus sectors. Winning teams are eligible to sign an MoU with BSNL to work as System Integrators — a direct bridge from a weekend prototype to real deployment. Entry fee ₹500 per participant.",
+      "A competitive build track across the summit's focus sectors. Teams build working prototypes on real industry problem statements, mentored by industry and BSNL experts. Entry fee ₹499/- per participant.",
   },
+];
+
+// "Attend" menu: every form's own URL. On this page a click opens the popup in place
+// (see the click handler in HomePage); shared links load the lightweight form pages.
+const attendLinks: { href: string; label: string; icon: LucideIcon; slug?: SubmissionSlug }[] = [
+  { href: "/register", label: "Register for Summit", icon: Ticket },
+  { href: "/stalls", label: "Book a Stall", icon: Store, slug: "expo" },
+  { href: "/startup-pitches", label: "Startup Pitches", icon: Lightbulb, slug: "ideas" },
+  { href: "/speakers", label: "Call for Speakers", icon: Megaphone, slug: "speakers" },
+  { href: "/oem", label: "OEM Registration", icon: Factory, slug: "oem" },
+  { href: "/awards", label: "Nominate for Awards", icon: Trophy, slug: "awards" },
+  { href: "/hackathon", label: "BSNL HackFest", icon: Code2, slug: "hackathon" },
+];
+
+const formSlugByPath = new Map(
+  attendLinks.flatMap((link) => (link.slug ? [[link.href, link.slug] as const] : [])),
+);
+
+const objectives = [
+  "Build a unified platform linking innovators with policymakers, public sector enterprises, and global investors.",
+  "Accelerate commercialization through direct industry mentoring, incubation, and institutional funding.",
+  "Promote inclusive entrepreneurship with dedicated tracks for women innovators and grassroots regional talent.",
+  "Equip young innovators with actionable tools to translate research into viable business ventures under the \"Startup India\" mission.",
+];
+
+const overviewAudience = [
+  "Researchers, PhD scholars, and academic faculty",
+  "Early-stage and growth-stage startup founders",
+  "Venture capitalists, angel networks, and seed funds",
+  "Pan-India educational institutions",
+  "Telecom, automation, and enterprise leaders",
+  "Government entities supporting startups & entrepreneurs",
+  "Engineering, technical, and management students",
+  "Government agencies, PSUs, and policy decision-makers",
+  "IPR entities",
 ];
 
 const navLinks = [
   { href: "#overview", label: "Overview" },
-  { href: "#technologies", label: "Technologies" },
-  { href: "#get-involved", label: "Participate Hackathon", pointsAtHackathon: true },
-  { href: "#get-involved", label: "Attend" },
-  { href: "#register", label: "Register" },
+  { href: "#technologies", label: "Conference Themes" },
+  { href: "#get-involved", label: "Attend", submenu: true },
 ];
 
-function Index() {
+function HomePage() {
+  const [registrationOpen, setRegistrationOpen] = useState(false);
+  const [activeForm, setActiveForm] = useState<SubmissionSlug | null>(null);
   const [pointingAtHackathon, setPointingAtHackathon] = useState(false);
   const [show3DBackdrop, setShow3DBackdrop] = useState(true);
+  useScrollReveal();
 
-  // "Participate Hackathon" scrolls to Navonmesh Hackathon 2026 in Get Involved and highlights it.
+  // "Participate HackFest" scrolls to Navonmesh HackFest in Get Involved and highlights it.
   function pointAtHackathon(event?: MouseEvent<HTMLAnchorElement>) {
     if (event) event.preventDefault();
     window.setTimeout(() => {
@@ -288,38 +339,85 @@ function Index() {
     }, 250);
   }
 
+  // Every link to /register or a form page (/speakers, /stalls, ...) — nav, Attend menu,
+  // chatbot answers, showcase cards — opens that popup in place instead of leaving the page.
+  useEffect(() => {
+    function handleClick(event: globalThis.MouseEvent) {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+      const anchor = (event.target as Element | null)?.closest?.("a[href]");
+      const href = anchor?.getAttribute("href");
+      if (href === "/register") {
+        event.preventDefault();
+        setRegistrationOpen(true);
+        return;
+      }
+      const slug = href ? formSlugByPath.get(href) : undefined;
+      if (slug) {
+        event.preventDefault();
+        setActiveForm(slug);
+      }
+    }
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
+
+
   return (
     <main className="min-h-screen overflow-hidden bg-night text-night-foreground">
-      <header className="absolute inset-x-0 top-0 z-20 mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
+      <header className="absolute inset-x-0 top-0 z-20 mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-3 sm:px-8 sm:py-5">
         <a href="#top" className="flex items-center" aria-label="Navonmesh home">
           <img
-            src="/navonmesh-logo.jpeg"
-            alt="Navonmesh — Ideas, Innovation, Impact"
-            className="h-12 w-auto rounded-lg bg-white object-contain shadow-night sm:h-14"
+            src={qtfsfLogo}
+            alt="Quality Thought Future Skills Foundation"
+            className="h-8 w-auto max-w-[38vw] rounded-md bg-white object-contain px-1.5 py-0.5 shadow-night sm:h-12 sm:max-w-none sm:rounded-lg sm:px-2 sm:py-1 md:h-14"
           />
         </a>
 
         <nav className="hidden items-center gap-7 lg:flex">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={link.pointsAtHackathon ? pointAtHackathon : undefined}
-              className="text-sm font-medium text-night-foreground/70 transition-colors hover:text-tech"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) =>
+            link.submenu ? (
+              <DropdownMenu key={link.label} modal={false}>
+                <DropdownMenuTrigger className="inline-flex items-center gap-1 text-sm font-medium text-night-foreground/70 outline-none transition-colors hover:text-tech data-[state=open]:text-tech">
+                  {link.label}
+                  <ChevronDown className="size-3.5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="center"
+                  className="w-60 border-tech/30 bg-night-deep/95 p-1.5 text-night-foreground backdrop-blur-xl"
+                >
+                  {attendLinks.map(({ href, label, icon: ItemIcon }) => (
+                    <DropdownMenuItem
+                      key={href}
+                      asChild
+                      className="cursor-pointer gap-2.5 rounded-md px-3 py-2 text-sm focus:bg-tech/15 focus:text-white"
+                    >
+                      <a href={href}>
+                        <ItemIcon className="size-4 text-tech" />
+                        {label}
+                      </a>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-sm font-medium text-night-foreground/70 transition-colors hover:text-tech"
+              >
+                {link.label}
+              </a>
+            ),
+          )}
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <ThemeToggle />
+        <div className="flex shrink-0 items-center gap-1 sm:gap-3">
 
           {/* 3D Horizon Ambience Toggle */}
           <button
             type="button"
             onClick={() => setShow3DBackdrop((prev) => !prev)}
-            className="group relative inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-night-deep/80 px-2.5 py-1.5 text-xs font-medium text-night-foreground/80 hover:border-tech/50 hover:text-tech transition-all"
+            className="group relative hidden items-center gap-1.5 rounded-full border border-white/15 bg-night-deep/80 px-2.5 py-1.5 text-xs sm:inline-flex font-medium text-night-foreground/80 hover:border-tech/50 hover:text-tech transition-all"
             title={show3DBackdrop ? "3D Background Active (Click for pure clean background)" : "3D Background Paused (Click to restore 3D horizon)"}
             aria-label={show3DBackdrop ? "Disable 3D background effects" : "Enable 3D background effects"}
           >
@@ -329,9 +427,11 @@ function Index() {
             </span>
           </button>
 
-          <Button asChild className="hidden rounded-full bg-signal text-paper hover:bg-signal/90 sm:inline-flex">
-            <a href="#register">Register now</a>
-          </Button>
+          <img
+            src={cmrLogo}
+            alt="CMR Group of Institutions"
+            className="h-8 w-auto max-w-[38vw] rounded-md bg-white object-contain px-1.5 py-0.5 shadow-night sm:h-12 sm:max-w-none sm:rounded-lg sm:px-2 sm:py-1 md:h-14"
+          />
 
           <Sheet>
             <SheetTrigger asChild>
@@ -344,31 +444,43 @@ function Index() {
                 <Menu className="size-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="border-night-foreground/10 bg-night text-night-foreground flex flex-col justify-between">
+            <SheetContent side="right" className="border-night-foreground/10 bg-night text-night-foreground flex flex-col justify-between overflow-y-auto">
               <div>
                 <SheetHeader>
                   <SheetTitle className="font-display text-night-foreground">Navonmesh Summit</SheetTitle>
                 </SheetHeader>
                 <nav className="mt-6 grid gap-1">
-                  {navLinks.map((link) => (
-                    <SheetClose asChild key={link.href}>
-                      <a
-                        href={link.href}
-                        onClick={link.pointsAtHackathon ? pointAtHackathon : undefined}
-                        className="rounded-md px-3 py-3 text-base font-medium text-night-foreground/80 transition-colors hover:bg-night-foreground/10 hover:text-tech"
-                      >
-                        {link.label}
-                      </a>
-                    </SheetClose>
-                  ))}
+                  {navLinks.map((link) =>
+                    link.submenu ? (
+                      <div key={link.label} className="grid gap-0.5">
+                        <p className="px-3 pb-1 pt-3 text-base font-medium text-night-foreground/80">{link.label}</p>
+                        {attendLinks.map(({ href, label, icon: ItemIcon }) => (
+                          <SheetClose asChild key={href}>
+                            <a
+                              href={href}
+                              className="ml-3 flex items-center gap-2.5 rounded-md border-l border-tech/30 px-3 py-2 text-sm text-night-foreground/70 transition-colors hover:bg-night-foreground/10 hover:text-tech"
+                            >
+                              <ItemIcon className="size-4 text-tech" />
+                              {label}
+                            </a>
+                          </SheetClose>
+                        ))}
+                      </div>
+                    ) : (
+                      <SheetClose asChild key={link.label}>
+                        <a
+                          href={link.href}
+                          className="rounded-md px-3 py-3 text-base font-medium text-night-foreground/80 transition-colors hover:bg-night-foreground/10 hover:text-tech"
+                        >
+                          {link.label}
+                        </a>
+                      </SheetClose>
+                    ),
+                  )}
                 </nav>
               </div>
 
               <div className="mt-auto space-y-3 pt-6 border-t border-night-foreground/10">
-                <div className="flex items-center justify-between px-1">
-                  <span className="text-xs font-mono text-night-foreground/70">Theme Mode</span>
-                  <ThemeToggle />
-                </div>
                 <div className="flex items-center justify-between px-1">
                   <span className="text-xs font-mono text-night-foreground/70">3D Background</span>
                   <button
@@ -380,11 +492,6 @@ function Index() {
                     <span className="font-mono text-[11px]">{show3DBackdrop ? "Active" : "Disabled"}</span>
                   </button>
                 </div>
-                <SheetClose asChild>
-                  <Button asChild className="w-full rounded-full bg-signal text-paper hover:bg-signal/90">
-                    <a href="#register">Register now</a>
-                  </Button>
-                </SheetClose>
               </div>
             </SheetContent>
           </Sheet>
@@ -417,41 +524,33 @@ function Index() {
         <div className="pointer-events-none absolute top-1/3 -left-32 -z-10 size-80 rounded-full bg-signal/10 blur-3xl" />
         <div className="pointer-events-none absolute top-1/3 -right-32 -z-10 size-80 rounded-full bg-[#10b981]/10 blur-3xl" />
 
-        <div className="mx-auto flex min-h-[calc(100svh-4rem)] lg:h-[calc(100svh-4rem)] max-w-7xl flex-col items-center justify-between px-4 py-2 sm:py-3 text-center sm:px-8">
-          {/* Enhanced & Enlarged Partner Showcase (BSNL, CMR, QTFSF) */}
-          <div className="grid w-full grid-cols-3 items-center gap-3 sm:gap-6 max-w-4xl">
-            <PartnerLogo
-              src={qtfsfLogo}
-              alt="Quality Thought Future Skills Foundation"
-              role="Organized by"
-              caption="QT Future Skills Foundation"
-              align="start"
-              variant="default"
-              delay="0s"
-            />
+        <div className="mx-auto flex min-h-[calc(100svh-4rem)] sm:min-h-[calc(100svh-5rem)] lg:h-[calc(100svh-5rem)] max-w-7xl flex-col items-center justify-between px-4 py-2 sm:py-3 text-center sm:px-8">
+          {/* Presenting partner (QTFSF and CMR logos sit in the header) */}
+          <div className="flex w-full justify-center">
             <PartnerLogo
               src={bsnlLogo}
               alt="BSNL — Connecting Bharat"
-              role="Presented by BSNL"
               caption="National 5G & Telecom Partner"
               align="center"
               variant="bsnl"
               delay="0.2s"
             />
-            <PartnerLogo
-              src={cmrLogo}
-              alt="CMR Group of Institutions"
-              role="Host & Knowledge Partner"
-              caption="CMR Campus, Hyderabad"
-              align="end"
-              variant="cmr"
-              delay="0.4s"
-            />
           </div>
 
           {/* Completely Redesigned High-Impact NAVONMESH Brand Graphic Centerpiece */}
-          <div className="my-auto flex flex-col items-center justify-center py-1 sm:py-2 w-full max-w-4xl">
-            <NavonmeshBrandGraphic />
+          <div className="my-auto flex flex-col items-center justify-center py-1 sm:py-2 short:py-0 w-full">
+            {/* Wide screens: highlighted Startup Pitches card on the left of the wordmark */}
+            <div className="relative flex w-full justify-center">
+              <div className="absolute inset-y-0 left-0 hidden items-center xl:flex">
+                <StartupPitchesHighlight layout="card" className="flex" />
+              </div>
+              <div className="w-full max-w-4xl animate-in fade-in zoom-in-95 duration-1000">
+                <NavonmeshBrandGraphic />
+              </div>
+            </div>
+
+            {/* Smaller screens: the same Startup Pitches highlight under the wordmark */}
+            <StartupPitchesHighlight layout="pill" className="mt-3 xl:hidden" />
 
             {/* The Tri-Pillars of the Summit */}
             <div className="mt-2.5 sm:mt-3 flex flex-wrap items-center justify-center gap-2 text-xs font-semibold tracking-wider uppercase">
@@ -466,23 +565,15 @@ function Index() {
               <span className="rounded-full border border-emerald-400/30 bg-emerald-950/40 px-3 py-0.5 text-emerald-300 backdrop-blur-sm">
                 Conclave
               </span>
-            </div>
-
-            {/* Official Summit Subtitle */}
-            <p className="mt-2 max-w-xl text-balance text-xs font-medium text-night-foreground/75 sm:text-sm leading-tight text-center">
-              National Research, Innovation, Startup & Academia Conclave
-            </p>
-
-            {/* Theme Quote with Cyber Glass Frame */}
-            <div className="mt-2 rounded-full border border-tech/25 bg-night/60 px-4 py-0.5 backdrop-blur-md">
-              <p className="font-display text-xs font-medium text-white/90 sm:text-sm tracking-wide">
-                “Catalysing India’s 5G Vision, Industry 4.0 & Beyond”
-              </p>
+              <span className="text-night-foreground/30 font-bold">·</span>
+              <span className="rounded-full border border-amber-300/40 bg-amber-500/10 px-3 py-0.5 text-amber-200 backdrop-blur-sm">
+                Startup Pitches
+              </span>
             </div>
           </div>
 
           {/* Unified Bottom Console: Date, Venue, Countdown & Actions (Guaranteed Above the Fold) */}
-          <div className="flex flex-col items-center w-full gap-2 sm:gap-3 mt-auto pb-1 sm:pb-2">
+          <div className="flex flex-col items-center w-full gap-2 mt-auto pb-2 sm:pb-3">
             {/* Enhanced Conclave Telemetry Bar: Date, Venue & Live Countdown */}
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-medium text-night-foreground/80 max-w-5xl">
               {/* Enhanced Summit Dates Badge */}
@@ -541,45 +632,30 @@ function Index() {
             </div>
 
             {/* Interactive Hero Action CTAs */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
-              <Button
-                asChild
-                size="default"
-                className="rounded-full bg-signal px-7 py-2.5 text-sm sm:text-base font-bold text-paper shadow-xl shadow-signal/40 hover:bg-signal/90 hover:scale-105 transition-all ring-2 ring-signal/50"
-              >
-                <a href="#register">
-                  <span>Register for Summit</span>
-                  <ChevronRight className="size-4 ml-1" />
-                </a>
-              </Button>
-
-              <Button
-                asChild
-                size="default"
-                variant="outline"
-                className="rounded-full border-tech/50 bg-night-deep/80 px-5 text-sm sm:text-base text-white backdrop-blur-sm hover:bg-tech/20 hover:border-tech hover:scale-105 transition-all"
-              >
-                <a href="#technologies">
-                  <span>Explore 10 Pavilions</span>
-                </a>
-              </Button>
-
+            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+              <HighlightBadge icon={Store} value="50+" label="Exhibitors" tone="signal" />
               <a
                 href="#get-involved"
                 onClick={pointAtHackathon}
-                className="group inline-flex items-center gap-1.5 rounded-full border border-signal/50 bg-signal/15 px-3.5 py-1.5 text-xs font-bold text-signal backdrop-blur-sm transition-all hover:bg-signal/25 hover:border-signal shadow-sm"
+                className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-2xl border-2 border-signal bg-gradient-to-r from-signal/30 via-night-deep/90 to-tech/25 px-4 py-1.5 text-left backdrop-blur-md shadow-[0_0_30px_rgba(255,107,0,0.45)] ring-1 ring-white/15 transition-all hover:scale-105 hover:shadow-[0_0_45px_rgba(255,107,0,0.65)]"
               >
-                <Sparkles className="size-3.5 animate-pulse" />
-                <span>BSNL SI Hackathon</span>
-                <span className="rounded-full bg-signal px-1.5 py-0.5 text-[10px] text-paper font-black">MoU Ready</span>
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-signal text-paper shadow-lg shadow-signal/50">
+                  <Sparkles className="size-5 animate-pulse" />
+                </span>
+                <span className="flex flex-col leading-tight">
+                  <span className="font-display text-base font-black tracking-wide text-white">BSNL HackFest</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-signal">Participate now · ₹499/- per participant</span>
+                </span>
+                <ChevronRight className="size-5 text-signal transition-transform group-hover:translate-x-1" />
               </a>
+              <HighlightBadge icon={Megaphone} value="60+" label="Speakers" tone="tech" />
             </div>
 
             {/* Subtle Scroll Down Prompt */}
             <a
               href="#conclave-gallery"
               aria-label="Scroll down to Conclave and Student Tech Event gallery"
-              className="mt-1 hidden lg:grid size-7 place-items-center rounded-full border border-night-foreground/20 text-tech/60 transition-all hover:border-tech hover:text-tech hover:scale-110"
+              className="hidden [@media(min-width:1024px)_and_(min-height:860px)]:grid size-7 place-items-center rounded-full border border-night-foreground/20 text-tech/60 transition-all hover:border-tech hover:text-tech hover:scale-110"
             >
               <ArrowDown className="size-3.5 animate-bounce" />
             </a>
@@ -592,7 +668,37 @@ function Index() {
         <ConclaveEventScroll />
       </div>
 
-      <section id="overview" className="relative isolate overflow-hidden border-b border-night-foreground/10 bg-night-deep">
+      <section id="overview" className="bg-paper py-24 text-navy">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <SectionIntro light eyebrow="Objectives & Audience" title="Why the summit exists, and who it's for." text="Navonmesh connects research, startups, capital and policy on one national platform — with a clear path from idea to venture." />
+          <div className="mt-14 grid gap-12 lg:grid-cols-2">
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-[.18em] text-navy/60">Objectives</h3>
+              <div className="mt-5 grid gap-px overflow-hidden rounded-lg border border-navy/10 bg-navy/10">
+                {objectives.map((objective, index) => (
+                  <div key={objective} className="flex gap-5 bg-paper p-6">
+                    <span className="font-display text-sm font-bold text-signal">0{index + 1}</span>
+                    <p className="leading-relaxed text-navy/80">{objective}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-[.18em] text-navy/60">Who should attend</h3>
+              <div className="mt-5 grid gap-x-6 sm:grid-cols-2">
+                {overviewAudience.map((audience, index) => (
+                  <div key={audience} className="flex items-center gap-4 border-b border-navy/15 py-4">
+                    <span className="font-display text-sm text-signal">0{index + 1}</span>
+                    <p className="font-display font-semibold">{audience}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="event-intelligence" className="relative isolate overflow-hidden border-b border-night-foreground/10 bg-night-deep">
         {/* Interactive 3D Torus Knot & Holographic Network Background */}
         <TechBackgroundCanvas variant="overview-torus" intensity="subtle" />
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 relative z-10">
@@ -603,21 +709,21 @@ function Index() {
               value="03"
               label="Days"
               detail="Conclave + live exhibition"
-              more="29–31 October 2026 at the CMR Group of Institutions campus in Medchal, Hyderabad. Day one opens with plenaries and the expo floor; the hackathon and MoU signings run across all three days, closing with awards and the investor pitch showcase."
+              more="29–31 October 2026 at the CMR Group of Institutions campus in Medchal, Hyderabad. Day one opens with plenaries and the expo floor; the HackFest and OEM showcase run across all three days, closing with awards and the investor pitch showcase."
             />
             <Stat
               icon={Network}
               value="04"
               label="Focus sectors"
               detail="Make · Connect · Sustain · Collaborate"
-              more="Make covers manufacturing, automation, hardware and health-tech. Connect spans 5G, telecom and digital services. Sustain covers renewable energy and circular economy. Collaborate is the cross-cutting layer — MoUs, funding and student tracks that tie the other three together."
+              more="Make covers manufacturing, automation, hardware and health-tech. Connect spans 5G, telecom and digital services. Sustain covers renewable energy and circular economy. Collaborate is the cross-cutting layer — partnerships, funding and student tracks that tie the other three together."
             />
             <Stat
               icon={Boxes}
               value="06"
               label="Event formats"
               detail="From expo floor to funding rooms"
-              more="Expo, MoU Signing Hub, Roundtable & Plenary, Investor Pitch & Mentorship, Student Immersion Tracks, and the NAVONMESH Hackathon — six distinct ways to engage, running in parallel across the three days. See the 'Six ways to participate' section below for details on each."
+              more="Expo, OEM Showcase, Roundtable & Plenary, Investor Pitch & Mentorship, Student Immersion Tracks, and the Navonmesh HackFest — six distinct ways to engage, running in parallel across the three days. See the 'Six ways to participate' section below for details on each."
             />
             <Stat
               icon={Users}
@@ -644,6 +750,7 @@ function Index() {
           <SectionIntro eyebrow="Technology pavilions" title="Every domain has its own stage." text="A visual field guide to the technologies explicitly shaping the summit’s Make, Connect and Sustain sectors." />
           <div className="mt-14 grid gap-5 md:grid-cols-2">
             {technologies.map((technology) => <TechnologyCard key={technology.number} technology={technology} />)}
+            <OemCard />
           </div>
         </div>
       </section>
@@ -658,17 +765,17 @@ function Index() {
               <Dialog key={format.code}>
                 <DialogTrigger asChild>
                   <article
-                    id={format.code === "Hackathon" ? "hackathon-card" : undefined}
+                    id={format.code === "HackFest" ? "hackathon-card" : undefined}
                     className={`relative cursor-pointer bg-paper p-7 text-left transition-colors hover:bg-mint/20 ${
-                      format.code === "Hackathon" && pointingAtHackathon
+                      format.code === "HackFest" && pointingAtHackathon
                         ? "z-10 bg-mint/30 ring-4 ring-inset ring-signal"
                         : ""
                     }`}
                   >
-                    {format.code === "Hackathon" && pointingAtHackathon && (
+                    {format.code === "HackFest" && pointingAtHackathon && (
                       <span className="absolute right-4 top-3 flex animate-bounce items-center gap-1.5 rounded-full bg-signal px-3 py-1 text-xs font-bold uppercase tracking-wide text-paper shadow-signal">
                         <MousePointerClick className="size-3.5" />
-                        Student hackathon
+                        Navonmesh HackFest
                       </span>
                     )}
                     <div className="flex items-start justify-between gap-4">
@@ -694,61 +801,6 @@ function Index() {
         </div>
       </section>
 
-      <section className="bg-night-deep py-24">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 sm:px-8 lg:grid-cols-[1.1fr_.9fr]">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[.18em] text-tech">Highlighted pathway</p>
-            <h2 className="mt-4 max-w-3xl text-balance font-display text-4xl font-semibold sm:text-5xl">From hackathon prototype to BSNL System Integrator opportunity.</h2>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-night-foreground/65">Hackathon 2026 winners are eligible to sign an MoU with BSNL to work as System Integrators—a direct bridge from hands-on innovation to enterprise deployment.</p>
-            <div className="mt-9 grid max-w-2xl grid-cols-3 gap-px overflow-hidden rounded-lg bg-night-foreground/10 text-center">
-              {[["01", "Build"], ["02", "Demonstrate"], ["03", "Integrate"]].map((item) => (
-                <div key={item[0]} className="bg-night p-5"><p className="font-display text-2xl text-signal">{item[0]}</p><p className="mt-1 text-xs uppercase tracking-[.12em] text-night-foreground/60">{item[1]}</p></div>
-              ))}
-            </div>
-          </div>
-          <div className="relative isolate overflow-hidden rounded-2xl border border-tech/30 bg-night p-3 shadow-2xl shadow-tech/10">
-            {/* Tech Image representing System Integration, 5G Telecom Network & Student Engineering */}
-            <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-night-surface">
-              <img
-                src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80"
-                loading="lazy"
-                referrerPolicy="no-referrer"
-                alt="Cybernetic digital architecture representing the BSNL System Integrator MoU pathway"
-                className="size-full object-cover transition-transform duration-700 hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-night-deep via-night/30 to-transparent" />
-
-              {/* High-tech telemetry badges */}
-              <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-tech/40 bg-night/85 px-3 py-1 text-[11px] font-semibold text-tech backdrop-blur-md">
-                  <Network className="size-3.5 text-signal" />
-                  <span>BSNL Enterprise SI Hub</span>
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-950/85 px-2.5 py-1 text-[10px] font-bold text-emerald-300 backdrop-blur-md">
-                  <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span>MoU Ready</span>
-                </span>
-              </div>
-
-              <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/15 bg-night/90 p-4 backdrop-blur-md">
-                <div className="flex items-center justify-between text-xs text-night-foreground/80">
-                  <span className="font-semibold text-white">Pathway Architecture</span>
-                  <span className="text-tech font-mono">Stage 03: Deployment</span>
-                </div>
-                <div className="mt-2 flex items-center gap-2">
-                  <div className="h-1.5 flex-1 rounded-full bg-night-foreground/20 overflow-hidden">
-                    <div className="h-full w-full bg-gradient-to-r from-signal via-tech to-emerald-400" />
-                  </div>
-                  <span className="font-mono text-[11px] font-bold text-signal">Direct SI</span>
-                </div>
-                <p className="mt-2 text-[11px] leading-relaxed text-night-foreground/75">
-                  Winners transition directly into BSNL-verified System Integrator partners for Pan-India telecom testbed deployments.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section id="attend" className="bg-mint py-24 text-navy">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -775,10 +827,10 @@ function Index() {
           <SectionIntro
             eyebrow="Get involved"
             title="Take the stage, the floor or the podium."
-            text="Pitch an idea, speak, exhibit, nominate for an award or join the Navonmesh Hackathon 2026. Each opens a short form — no account needed."
+            text="Pitch an idea, speak, exhibit, register as an OEM, nominate for an award or join the Navonmesh HackFest. Each opens a short form — no account needed."
           />
           <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
-            {submissionForms.map((form, index) => {
+            {submissionForms.filter((form) => form.listed !== false).map((form) => {
               const Icon = form.icon;
               const isHackathon = form.slug === "hackathon";
               return (
@@ -790,12 +842,12 @@ function Index() {
                       isHackathon && pointingAtHackathon
                         ? "border-signal bg-night-surface ring-4 ring-signal/70 shadow-[0_0_35px_rgba(255,107,0,0.5)] z-10 scale-[1.02]"
                         : "border-night-foreground/10 bg-night-surface hover:border-tech/50"
-                    } ${index >= 3 ? "lg:col-span-3" : "lg:col-span-2"}`}
+                    } lg:col-span-2`}
                   >
                     {isHackathon && pointingAtHackathon && (
                       <span className="absolute -top-3.5 right-4 flex animate-bounce items-center gap-1.5 rounded-full bg-signal px-3.5 py-1 text-xs font-bold uppercase tracking-wide text-paper shadow-lg shadow-signal/40">
                         <Sparkles className="size-3.5" />
-                        Navonmesh Hackathon 2026
+                        Navonmesh HackFest
                       </span>
                     )}
                     <div className="flex items-start justify-between gap-4">
@@ -810,52 +862,19 @@ function Index() {
                     </div>
                     <h3 className="mt-8 font-display text-2xl font-semibold">{form.title}</h3>
                     <p className="mt-3 text-sm leading-relaxed text-night-foreground/60">{form.summary}</p>
-                    <span className={`mt-6 text-xs font-semibold uppercase tracking-[.12em] ${isHackathon ? "text-signal" : "text-tech"}`}>
+                    {form.deadline && (
+                      <span className="mt-5 inline-flex items-center gap-1.5 self-start rounded-full border border-signal/40 bg-signal/10 px-3 py-1 text-xs font-semibold text-signal">
+                        <CalendarDays className="size-3.5" />
+                        Last date: {form.deadline}
+                      </span>
+                    )}
+                    <span className={`mt-auto pt-6 text-xs font-semibold uppercase tracking-[.12em] ${isHackathon ? "text-signal" : "text-tech"}`}>
                       Open form <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
                     </span>
                   </button>
                 </SubmissionFormDialog>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      <section id="register" className="relative isolate overflow-hidden bg-night-deep py-24">
-        {/* Interactive 3D Portal Ring Background */}
-        <TechBackgroundCanvas variant="registration-portal" intensity="subtle" />
-        <div className="mx-auto max-w-7xl px-5 sm:px-8 relative z-10">
-          <SectionIntro
-            eyebrow="Registration"
-            title="Register your organization for Navonmesh 2026."
-            text="Bring your enterprise, startup, academic institution, or research delegation to participate in the expo floor, sponsor the conclave, or nominate for national awards."
-          />
-          <div className="mt-14 grid gap-10 lg:grid-cols-[.75fr_1.25fr] lg:items-start">
-            <div className="grid gap-4">
-              {[
-                ["01", "Tell us about your organization", "Share your organization profile, sector, and delegate details."],
-                ["02", "We match you to the right track", "Expo pavilion booth, strategic partnership, sponsorship, or award nomination."],
-                ["03", "Confirm & arrive", "Receive official credentials and passes ahead of 29 October 2026."],
-              ].map((step) => (
-                <div key={step[0]} className="rounded-lg border border-night-foreground/10 bg-night p-6">
-                  <span className="font-display text-sm text-signal">{step[0]}</span>
-                  <h3 className="mt-3 font-display text-xl font-semibold">{step[1]}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-night-foreground/55">{step[2]}</p>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-2xl border border-tech/30 bg-night/95 p-6 sm:p-8 backdrop-blur-xl shadow-2xl shadow-tech/10">
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-night-foreground/10 pb-4">
-                <div>
-                  <h3 className="font-display text-2xl font-bold text-white">Organization Registration</h3>
-                  <p className="text-xs text-night-foreground/65 mt-1">Enterprise Delegates · Exhibitors · Academic Institutions · Industry Partners</p>
-                </div>
-                <span className="rounded-full border border-tech/40 bg-tech/15 px-3.5 py-1 text-xs font-mono font-bold text-tech">
-                  Official Delegation
-                </span>
-              </div>
-              <OrganizationRegistrationForm />
-            </div>
           </div>
         </div>
       </section>
@@ -868,6 +887,18 @@ function Index() {
       </footer>
 
       <ChatWidget />
+      <RegisterPromo onRegister={() => setRegistrationOpen(true)} suppressed={registrationOpen} />
+      <RegistrationDialog open={registrationOpen} onOpenChange={setRegistrationOpen} />
+      {activeForm && (
+        <SubmissionFormDialog
+          key={activeForm}
+          form={submissionForms.find((form) => form.slug === activeForm)!}
+          open
+          onOpenChange={(open) => {
+            if (!open) setActiveForm(null);
+          }}
+        />
+      )}
     </main>
   );
 }
@@ -883,7 +914,7 @@ function PartnerLogo({
 }: {
   src: string;
   alt: string;
-  role: string;
+  role?: string;
   caption?: string;
   align?: "start" | "center" | "end";
   variant?: "default" | "bsnl" | "cmr";
@@ -894,27 +925,31 @@ function PartnerLogo({
 
   return (
     <div
-      className="flex min-w-0 w-full flex-col items-center justify-center gap-1.5 sm:gap-2 transition-all duration-300 group"
+      className={`flex min-w-0 w-full flex-col items-center justify-center gap-1.5 sm:gap-2 transition-all duration-300 group lg:w-auto ${
+        align === "start" ? "lg:justify-self-start" : align === "end" ? "lg:justify-self-end" : "lg:justify-self-center"
+      }`}
       style={{ animationDelay: delay }}
     >
-      <div className="flex max-w-full items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-night-deep/90 border border-white/10 shadow-sm">
-        <span
-          className={`size-1.5 shrink-0 rounded-full ${
-            isBsnl ? "bg-signal animate-ping" : isCmr ? "bg-emerald-400 animate-pulse" : "bg-tech"
-          }`}
-        />
-        <span className="min-w-0 flex-1 truncate text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider text-night-foreground/90 sm:max-w-none">
-          {role}
-        </span>
-      </div>
+      {role && (
+        <div className="flex max-w-full items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-night-deep/90 border border-white/10 shadow-sm">
+          <span
+            className={`size-1.5 shrink-0 rounded-full ${
+              isBsnl ? "bg-signal animate-ping" : isCmr ? "bg-emerald-400 animate-pulse" : "bg-tech"
+            }`}
+          />
+          <span className="min-w-0 flex-1 truncate text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider text-night-foreground/90 sm:max-w-none">
+            {role}
+          </span>
+        </div>
+      )}
 
       <div
         className={`relative flex items-center justify-center rounded-2xl bg-white px-3 sm:px-4 py-1.5 sm:py-2 transition-all duration-300 group-hover:scale-105 ${
           isBsnl
-            ? "h-14 sm:h-16 md:h-18 w-full max-w-[180px] sm:max-w-[215px] ring-2 ring-tech/80 shadow-[0_8px_30px_rgba(56,189,248,0.3)] hover:shadow-[0_0_35px_rgba(56,189,248,0.5)]"
+            ? "h-24 sm:h-28 md:h-32 short:h-24 w-full max-w-[280px] sm:max-w-[340px] lg:w-[410px] lg:max-w-none short:w-[330px] ring-2 ring-tech/80 shadow-[0_8px_30px_rgba(56,189,248,0.3)] hover:shadow-[0_0_35px_rgba(56,189,248,0.5)]"
             : isCmr
-              ? "h-13 sm:h-15 md:h-17 w-full max-w-[170px] sm:max-w-[200px] ring-1.5 ring-emerald-400/50 shadow-[0_6px_25px_rgba(0,0,0,0.5)] hover:ring-emerald-400 hover:shadow-[0_0_25px_rgba(52,211,153,0.35)]"
-              : "h-13 sm:h-15 md:h-17 w-full max-w-[170px] sm:max-w-[200px] ring-1.5 ring-tech/40 shadow-[0_6px_25px_rgba(0,0,0,0.5)] hover:ring-tech hover:shadow-[0_0_25px_rgba(56,189,248,0.3)]"
+              ? "h-13 sm:h-15 md:h-17 short:h-13 w-full max-w-[170px] sm:max-w-[200px] lg:w-[210px] lg:max-w-none ring-1.5 ring-emerald-400/50 shadow-[0_6px_25px_rgba(0,0,0,0.5)] hover:ring-emerald-400 hover:shadow-[0_0_25px_rgba(52,211,153,0.35)]"
+              : "h-13 sm:h-15 md:h-17 short:h-13 w-full max-w-[170px] sm:max-w-[200px] lg:w-[210px] lg:max-w-none ring-1.5 ring-tech/40 shadow-[0_6px_25px_rgba(0,0,0,0.5)] hover:ring-tech hover:shadow-[0_0_25px_rgba(56,189,248,0.3)]"
         }`}
       >
         <img
@@ -925,11 +960,76 @@ function PartnerLogo({
       </div>
 
       {caption && (
-        <span className="max-w-full truncate text-[10px] sm:text-[11px] font-medium text-night-foreground/75 text-center leading-tight">
+        <span className="max-w-full truncate text-[10px] sm:text-[11px] font-medium text-night-foreground/75 text-center leading-tight short:hidden">
           {caption}
         </span>
       )}
     </div>
+  );
+}
+
+// Hero highlight ("50+ Exhibitors", "60+ Speakers") sized to match the BSNL HackFest button it flanks.
+function HighlightBadge({
+  icon: Icon,
+  value,
+  label,
+  tone,
+}: {
+  icon: LucideIcon;
+  value: string;
+  label: string;
+  tone: "signal" | "tech";
+}) {
+  const colors =
+    tone === "signal"
+      ? {
+          border: "border-signal/70",
+          icon: "bg-signal text-paper shadow-signal/50",
+          label: "text-signal",
+        }
+      : {
+          border: "border-tech/70",
+          icon: "bg-tech text-night-deep shadow-tech/50",
+          label: "text-tech",
+        };
+
+  return (
+    <div
+      className={`inline-flex items-center gap-3 rounded-2xl border-2 ${colors.border} bg-night-deep/90 px-5 py-2 text-left backdrop-blur-md ring-1 ring-white/15 transition-transform duration-300 hover:scale-105`}
+    >
+      <span className={`grid size-10 shrink-0 place-items-center rounded-lg shadow-lg ${colors.icon}`}>
+        <Icon className="size-6" />
+      </span>
+      <span className="flex flex-col leading-tight">
+        <span className="font-display text-2xl font-black tracking-wide text-white">{value}</span>
+        <span className={`text-xs font-bold uppercase tracking-wider ${colors.label}`}>{label}</span>
+      </span>
+    </div>
+  );
+}
+
+// Highlighted hero call-out for Startup Pitches; the page's link handler opens its form in place.
+function StartupPitchesHighlight({ layout, className = "" }: { layout: "card" | "pill"; className?: string }) {
+  const card = layout === "card";
+  return (
+    <a
+      href="/startup-pitches"
+      className={`group relative items-center rounded-2xl border border-amber-100/50 bg-night-deep/80 backdrop-blur-xl shadow-[0_0_24px_rgba(254,243,199,0.18)] ring-1 ring-white/10 transition-all duration-300 hover:scale-105 hover:border-amber-100/80 hover:shadow-[0_0_36px_rgba(254,243,199,0.32)] animate-in fade-in slide-in-from-left-8 duration-1000 ${
+        card ? "w-[170px] flex-col gap-1.5 px-4 py-4 text-center" : "inline-flex gap-3 px-4 py-2 text-left"
+      } ${className}`}
+    >
+      <span className="pointer-events-none absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-br from-amber-100 via-white to-amber-200 opacity-15 blur-lg animate-pulse [animation-duration:3s]" />
+      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-amber-100 text-night-deep shadow-md shadow-amber-100/30">
+        <Lightbulb className="size-6" />
+      </span>
+      <span className="flex flex-col leading-tight">
+        <span className="font-display text-lg font-black uppercase tracking-wide text-white">Startup Pitches</span>
+        <span className="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-amber-100/80">Pitch to investors</span>
+      </span>
+      <span className={`inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-night-deep transition-transform group-hover:translate-x-0.5 ${card ? "mt-1" : ""}`}>
+        Apply now <ChevronRight className="size-3.5" />
+      </span>
+    </a>
   );
 }
 
@@ -983,6 +1083,57 @@ function Stat({
 
 function JourneyStep({ icon: Icon, number, title, text, last = false }: { icon: LucideIcon; number: string; title: string; text: string; last?: boolean }) {
   return <article className="relative rounded-lg border border-night-foreground/10 bg-night p-6"><div className="flex items-center justify-between"><span className="grid size-11 place-items-center rounded-full bg-tech/10 text-tech"><Icon className="size-5" /></span><span className="font-display text-sm text-signal">{number}</span></div><h3 className="mt-7 font-display text-2xl font-semibold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-night-foreground/55">{text}</p>{!last && <span className="event-link absolute -right-4 top-10 z-10 hidden h-px w-8 bg-tech/60 lg:block" />}</article>;
+}
+
+const oemTags = ["Manufacturers", "Product showcase", "Buyer connect"];
+
+// Full-width card closing the pavilion grid: OEMs cut across every domain above.
+// Details only — OEM registration lives in the Get involved section.
+function OemCard() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <article className="group relative isolate cursor-pointer overflow-hidden rounded-lg border-2 border-signal/60 bg-night-surface p-7 text-left shadow-[0_0_35px_rgba(255,107,0,0.2)] transition-transform duration-500 hover:-translate-y-1 sm:p-9 md:col-span-2">
+          <img src={oemImage} loading="lazy" alt="" className="absolute inset-0 -z-20 size-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-[1.03]" />
+          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-night-deep via-night-deep/85 to-night-deep/40" />
+          <div className="flex items-center gap-3">
+            <span className="grid size-14 place-items-center rounded-lg border border-signal/40 bg-signal/15 text-signal backdrop-blur">
+              <Factory className="size-7" strokeWidth={1.5} />
+            </span>
+            <span className="rounded-full bg-signal px-3 py-1 text-xs font-bold uppercase tracking-wider text-paper">
+              All domains
+            </span>
+          </div>
+          <div className="mt-8 max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-[.18em] text-signal">Original Equipment Manufacturers</p>
+            <h3 className="mt-2 font-display text-3xl font-semibold sm:text-4xl">OEM Pavilion</h3>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-night-foreground/70">
+              Manufacturers from every domain — telecom, electronics, automation, energy, health and agri equipment — showcase products and meet buyers, integrators and enterprise partners.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {oemTags.map((tag) => (
+                <span key={tag} className="rounded-full border border-night-foreground/15 bg-night/45 px-3 py-1 text-xs text-night-foreground/65 backdrop-blur">{tag}</span>
+              ))}
+            </div>
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[.12em] text-signal">Read more →</p>
+          </div>
+        </article>
+      </DialogTrigger>
+      <DialogContent className="border-night-foreground/10 bg-night-surface text-night-foreground sm:max-w-lg">
+        <DialogHeader>
+          <span className="text-xs font-bold uppercase tracking-[.18em] text-signal">All domains</span>
+          <DialogTitle className="font-display text-2xl text-night-foreground">OEM Pavilion</DialogTitle>
+          <DialogDescription className="text-night-foreground/65">
+            Original equipment manufacturers across every summit domain.
+          </DialogDescription>
+        </DialogHeader>
+        <p className="text-sm leading-relaxed text-night-foreground/75">
+          A dedicated pavilion for OEMs — telecom and networking gear, electronics and components, electrical equipment, industrial machinery and automation, automotive and EV, renewable energy, medical devices and agricultural equipment. Manufacturers showcase shipping products and meet procurement teams, system integrators and enterprise partners face to face across all three days.
+        </p>
+        <div className="flex flex-wrap gap-2">{oemTags.map((tag) => <span key={tag} className="rounded-full border border-night-foreground/15 bg-night/45 px-3 py-1 text-xs text-night-foreground/65">{tag}</span>)}</div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function TechnologyCard({ technology }: { technology: Technology }) {
